@@ -5,11 +5,11 @@
 class MidiSender {
 public:
 	MidiSender() {
-		midiOut.openPort(0);
+		//midiOut.openPort(0);
 	}
 
 	~MidiSender() {
-		midiOut.closePort();
+		//midiOut.closePort();
 	}
 
 	void sendMidiOn(USHORT ch, USHORT midiNum, USHORT velocity) {
@@ -21,6 +21,5 @@ public:
 	}
 	
 private:
-	
 	ofxMidiOut midiOut;
 };

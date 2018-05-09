@@ -6,12 +6,14 @@ void ofApp::setup() {
 	ofSetFrameRate(60);
 	ofBackground(0);
 
-	// 16 beat, 4 bar loop, 16 instrument(midi ch)
-	score.setup(16, 4, 16);
+	// 16 beats, 4 bars loop, 16 instruments (midi channels)
+	score.setup(16, 4, 16, 16);
 	
 	// bpm = 120
-	sequenser.init(score, 120);
-
+	sequencer.init(score, 120);
+	
+	ui.setup(score, sequencer);
+	ui.setPosition(32, ofGetHeight() - 32);
 
 }
 
@@ -22,14 +24,9 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-	int h = 0;
+	
+	ui.draw(32, 32);
 
-	ofDrawBitmapString("bpm: " + ofToString(sequenser.getBpm()), 16, 32 + 16 * (++h));
-	ofDrawBitmapString("bar: " + ofToString(sequenser.getCurrentBar()), 16, 32 + 16 * (++h));
-	ofDrawBitmapString("beat: " + ofToString(sequenser.getCurrentBeat()), 16, 32 + 16 * (++h));
-	ofDrawBitmapString("delta: " + ofToString(sequenser.getDelta()), 16, 32 + 16 * (++h));
-	h++;
-	ofDrawBitmapString("fps: " + ofToString(ofGetFrameRate()), 16, 32 + 16 * (++h));
 }
 
 //--------------------------------------------------------------

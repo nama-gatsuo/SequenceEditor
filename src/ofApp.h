@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "ScoreManager.h"
 #include "Sequencer.h"
-
+#include "UIManager.h"
 
 class ofApp : public ofBaseApp {
 
@@ -19,5 +19,6 @@ public:
 
 private:
 	ScoreManager score;
-	Sequencer sequenser;
+	Sequencer sequencer;
+	UIManager ui;
 };
