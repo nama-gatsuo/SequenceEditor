@@ -5,11 +5,13 @@
 class MidiSender {
 public:
 	MidiSender() {
-		//midiOut.openPort(0);
+		midiOut.listPorts();
+		// LoopMidi = 1
+		midiOut.openPort(1);
 	}
 
 	~MidiSender() {
-		//midiOut.closePort();
+		midiOut.closePort();
 	}
 
 	void sendMidiOn(USHORT ch, USHORT midiNum, USHORT velocity) {

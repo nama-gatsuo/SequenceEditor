@@ -13,7 +13,7 @@ struct MidiModel {
 struct NoteModel {
 	
 	NoteModel() {}
-	NoteModel(USHORT ch, USHORT duration, USHORT barNum, USHORT beatNum, USHORT pitch, USHORT velocity) :
+	NoteModel(USHORT ch, USHORT barNum, USHORT beatNum, USHORT pitch, USHORT velocity, USHORT duration) :
 		ch(ch), duration(duration), barNum(barNum), beatNum(beatNum), pitch(pitch), velocity(velocity){}
 	NoteModel(const NoteModel& n) {
 		ch = n.ch;

@@ -8,7 +8,7 @@ using namespace glm;
 
 class UIManager {
 public:
-	UIManager(int gridSize = 32);
+	UIManager(int gridSize = 32, int defaultVelocity = 100);
 	~UIManager();
 
 	void setup(ScoreManager& score, Sequencer& sequencer);
@@ -16,9 +16,9 @@ public:
 	void draw(int offsetX, int offsetY);
 
 	void mouseMoved(ofMouseEventArgs& args);
-	/*void mousePressed(ofMouseEventArgs& args);
+	void mousePressed(ofMouseEventArgs& args);
 	void mouseDragged(ofMouseEventArgs& args);
-	void mouseReleased(ofMouseEventArgs& args);*/
+	void mouseReleased(ofMouseEventArgs& args);
 	void keyPressed(ofKeyEventArgs& args);
 
 private:
@@ -32,22 +32,19 @@ private:
 	int gridSize;
 	ivec2 startPos;
 	ivec2 size;
+	int defaultVelocity;
 
-	struct HoverInfo {
-		bool isGridHover;
-		ivec2 gridIndex;
+	struct State {
+		enum struct Code {
+			FREE, HOVER_EMPTY, HOVER_NOTE, DRAG_EDIT, DRAG_CREATE
+		} code;
 
-		bool isNoteHover;
+		ivec2 current;
+		ivec2 pressed;
 		int noteId;
-	} hover;
 
-	struct DragInfo {
-		bool isDragged;
-		ivec2 pressedIndex;
-		ivec2 currentIndex;
-		ivec2 releaseIndex;
-	};
-
+	} state;
+	
 	GridUI grids;
 
 };

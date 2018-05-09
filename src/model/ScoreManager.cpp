@@ -39,7 +39,7 @@ int ScoreManager::create(USHORT ch, USHORT barNum, const NoteModel& note) {
 	auto& e = midis[beatAndBar.second][ch][beatAndBar.first];
 	e.push_back(std::make_shared<MidiModel>(false, 0, note.pitch));
 	
-	int lastId = notes.size();
+	int lastId = notes[barNum][ch].size();
 	notes[barNum][ch].emplace(lastId, note);
 	notes[barNum][ch][lastId].midi[0].it = s.cbegin() + s.size() - 1;
 	notes[barNum][ch][lastId].midi[1].it = e.cbegin() + e.size() - 1;

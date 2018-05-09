@@ -30,15 +30,15 @@ public:
 		return data[bar][ch];
 	}
 	
-	void setBar(USHORT bar) {
-		if (bar > BAR) bar -= BAR;
+	void setBar(int bar) {
+		if (bar >= BAR) bar -= BAR;
 		else if (bar < 0) bar += BAR;
 
 		this->bar = bar;
 		
-	}
-	void setChan(USHORT ch) {
-		if (ch > CHANNEL) ch -= CHANNEL;
+	} 
+	void setChan(int ch) {
+		if (ch >= CHANNEL) ch -= CHANNEL;
 		else if (ch < 0) ch += CHANNEL;
 		this->ch = ch;
 
@@ -50,13 +50,14 @@ public:
 		
 	}
 
-	USHORT getBar() { return bar; }
-	USHORT getChan() { return ch; }
-	
+	int getBar() { return bar; }
+	int getChan() { return ch; }
+	ofColor& getColor(int i) { return color[i]; }
+
 private:
 	USHORT bar;
 	USHORT ch;
-	ofColor color[4];
+	std::array<ofColor, 4> color;
 
 	// bar - ch - x(beat) - y(pitch)
 	vector<vector<Grid>> data;
