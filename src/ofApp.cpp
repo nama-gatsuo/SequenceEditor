@@ -7,7 +7,7 @@ void ofApp::setup() {
 	ofBackground(0);
 
 	// 16 beats, 4 bars loop, 16 instruments (midi channels)
-	score.setup(16, 4, 16, 16);
+	score.setup(16, 4, 16);
 	
 	// bpm = 120
 	sequencer.init(score, 120);

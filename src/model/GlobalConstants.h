@@ -1,6 +1,6 @@
 #pragma once
-#include "ofMain.h"
-#include "ScoreManager.h"
+
+class ScoreManager;
 
 static USHORT& BEAT = ScoreManager::beat;
 static USHORT& BAR = ScoreManager::barCount;

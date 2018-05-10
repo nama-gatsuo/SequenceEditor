@@ -75,6 +75,9 @@ void UIState::onMousePressed() {
 }
 
 void UIState::onMouseDragged(float x, float y, const ivec2& index) {
+	mouse.x = x;
+	mouse.y = y;
+
 	current = index;
 }
 

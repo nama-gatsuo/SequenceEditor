@@ -2,10 +2,11 @@
 #include "ofMain.h"
 #include "Models.h"
 #include "MidiSender.h"
+#include "ChannelInfo.h"
 
 class ScoreManager {
 public:
-	void setup(USHORT beat, USHORT barCount, USHORT channelCount, USHORT pitchCount);
+	void setup(USHORT beat, USHORT barCount, USHORT pitchCount);
 	void loadJson(const string& file) {}
 
 	// for sequencer IF
@@ -21,6 +22,8 @@ public:
 	std::unordered_map<int, NoteModel>& get();
 	int update(int id, const NoteModel& note);
 	void remove(int id);
+	
+	void drawChannelInfo();
 
 	// setter & getter
 	USHORT getBeat() { return beat; }
@@ -46,6 +49,8 @@ private:
 	// channel: 16 instruments
 	// (id, note)
 	vector<vector<std::unordered_map<int, NoteModel>>> notes;
+
+	vector<ChannelInfo> chanInfos;
 
 	MidiSender sender;
 

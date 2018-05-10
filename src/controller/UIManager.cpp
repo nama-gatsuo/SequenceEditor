@@ -30,9 +30,10 @@ void UIManager::setup(ScoreManager& score, Sequencer& sequencer) {
 	this->score->setCurrent(0, 0);
 
 	state.setup(grids, score);
+	gui.setup();
 }
 
-void UIManager::draw(int offsetX, int offsetY) const {
+void UIManager::draw(int offsetX, int offsetY) {
 	
 	// text info
 	int w = 160;
@@ -61,6 +62,17 @@ void UIManager::draw(int offsetX, int offsetY) const {
 	if (state.code != UIState::Code::FREE) {
 		ofDrawBitmapString("(" + ofToString(state.current.x) + "," + ofToString(state.current.y) + ")", ofGetMouseX(), ofGetMouseY());
 	}
+
+	// channel info gui
+	bool isDraw = true;
+	ImGuiWindowFlags window_flags = 0;
+
+	gui.begin();
+	ImGui::Begin("Channels", &isDraw, window_flags);
+	score->drawChannelInfo();
+	ImGui::End();
+	gui.end();
+
 }
 
 ivec2 UIManager::translateMousePos(int x, int y) {

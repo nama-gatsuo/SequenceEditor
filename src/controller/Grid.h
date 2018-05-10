@@ -38,10 +38,9 @@ public:
 		this->ch = ch;
 
 		float hue = 256 / CHANNEL * ch;
-		color[0].setHsb(hue, 256 * (1. - 0.1 * 1), 200);
-		color[1].setHsb(hue, 256 * (1. - 0.1 * 2), 200);
-		color[2].setHsb(hue, 256 * (1. - 0.1 * 3), 200);
-		color[3].setHsb(hue, 256 * (1. - 0.1 * 4), 200);
+		for (int i = 0; i < color.size(); i++) {
+			color[i].setHsb(hue, 256 * (0.7 - 0.1 * i), 255);
+		}
 
 	}
 

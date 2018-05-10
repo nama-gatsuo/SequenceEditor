@@ -5,6 +5,8 @@
 #include "GlobalConstants.h"
 #include "UIState.h"
 
+#include "ofxImGui.h"
+
 using namespace glm;
 
 class UIManager {
@@ -14,7 +16,7 @@ public:
 
 	void setup(ScoreManager& score, Sequencer& sequencer);
 	void setPosition(int x, int y) { startPos = ivec2(x, y); }
-	void draw(int offsetX, int offsetY) const;
+	void draw(int offsetX, int offsetY);
 
 	void mouseMoved(ofMouseEventArgs& args);
 	void mousePressed(ofMouseEventArgs& args);
@@ -26,7 +28,6 @@ public:
 private:
 
 	ivec2 translateMousePos(int x, int y);
-	void updateAreaId(USHORT x, USHORT y, USHORT d, int id);
 	void drawGrid() const;
 
 	ScoreManager * score;
@@ -40,5 +41,6 @@ private:
 	UIState state;
 	
 	GridUI grids;
+	ofxImGui::Gui gui;
 
 };

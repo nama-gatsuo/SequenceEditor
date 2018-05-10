@@ -5,8 +5,8 @@
 class MidiSender {
 public:
 	MidiSender() {
-		midiOut.listPorts();
-		// LoopMidi = 1
+		//midiOut.listPorts();
+		/// LoopMidi = 1
 		midiOut.openPort(1);
 	}
 
