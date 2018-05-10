@@ -96,6 +96,22 @@ void UIManager::drawGrid() {
 		ofDrawLine(0, y, size.x, y);
 	}
 	
+	// rhythm guide
+	USHORT cbeat = sequencer->getCurrentBeat();
+	USHORT cbar = sequencer->getCurrentBar();
+	USHORT bar = grids.getBar();
+	
+	if (cbar == bar) {
+		int o = 8;
+		ofDrawRectangle(cbeat * gridSize + o, PITCH * gridSize + o, gridSize - o * 2, gridSize - o * 2);
+	}
+
+	ofSetColor(255);
+	for (int i = 0; i < BEAT; i += 4) {
+		ofDrawBitmapString(ofToString(bar) + "." + ofToString(i/4), i * gridSize, PITCH * gridSize + 8);
+	}
+
+
 	// draw notes
 	auto& pairs = score->get(grids.getChan(), grids.getBar());
 	for (auto& pair : pairs) {
