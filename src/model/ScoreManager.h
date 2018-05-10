@@ -13,11 +13,14 @@ public:
 
 	// for UI IF: CRUD
 	// return id
-	int create(USHORT ch, USHORT barNum, const NoteModel& note);
-	NoteModel& get(USHORT ch, USHORT barNum, int id);
-	std::unordered_map<int, NoteModel>& get(USHORT ch, USHORT barNum);
-	int update(USHORT ch, USHORT barNum, int id, const NoteModel& note);
-	void remove(USHORT ch, USHORT barNum, int id);
+	void setBar(USHORT bar) { currentBar = bar; }
+	void setChan(USHORT ch) { currentChan = ch; }
+	void setCurrent(USHORT bar, USHORT ch);
+	int create(const NoteModel& note);
+	NoteModel& get(int id);
+	std::unordered_map<int, NoteModel>& get();
+	int update(int id, const NoteModel& note);
+	void remove(int id);
 
 	// setter & getter
 	USHORT getBeat() { return beat; }
@@ -30,7 +33,10 @@ public:
 	static USHORT pitchCount;
 
 private:
-	std::pair<USHORT, USHORT> calcEnd(USHORT startBeat, USHORT startBar, USHORT duration);
+	std::pair<USHORT, USHORT> calcEnd(USHORT startBeat, USHORT startBar, USHORT duration) const;
+
+	USHORT currentBar;
+	USHORT currentChan;
 
 	// bar:     4 bars
 	// channel: 16 instruments

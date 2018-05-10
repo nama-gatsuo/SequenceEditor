@@ -30,9 +30,10 @@ public:
 	
 	}
 	
-	USHORT getCurrentBeat() { return currentBeat; }
-	USHORT getCurrentBar() { return currentBar; }
-	USHORT getBpm() { return bpm; }
+	USHORT getCurrentBeat() const { return currentBeat; }
+	USHORT getCurrentBar() const { return currentBar; }
+	USHORT getBpm() const { return bpm; }
+	
 	void setBpm(USHORT bpm) {
 		this->bpm = bpm;
 		rhythm.setDelta(15000 / bpm);

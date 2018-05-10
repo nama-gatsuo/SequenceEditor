@@ -3,6 +3,7 @@
 #include "Sequencer.h"
 #include "Grid.h"
 #include "GlobalConstants.h"
+#include "UIState.h"
 
 using namespace glm;
 
@@ -13,18 +14,20 @@ public:
 
 	void setup(ScoreManager& score, Sequencer& sequencer);
 	void setPosition(int x, int y) { startPos = ivec2(x, y); }
-	void draw(int offsetX, int offsetY);
+	void draw(int offsetX, int offsetY) const;
 
 	void mouseMoved(ofMouseEventArgs& args);
 	void mousePressed(ofMouseEventArgs& args);
 	void mouseDragged(ofMouseEventArgs& args);
 	void mouseReleased(ofMouseEventArgs& args);
+	void mouseScrolled(ofMouseEventArgs& args);
 	void keyPressed(ofKeyEventArgs& args);
 
 private:
 
 	ivec2 translateMousePos(int x, int y);
-	void drawGrid();
+	void updateAreaId(USHORT x, USHORT y, USHORT d, int id);
+	void drawGrid() const;
 
 	ScoreManager * score;
 	Sequencer * sequencer;
@@ -34,16 +37,7 @@ private:
 	ivec2 size;
 	int defaultVelocity;
 
-	struct State {
-		enum struct Code {
-			FREE, HOVER_EMPTY, HOVER_NOTE, DRAG_EDIT, DRAG_CREATE
-		} code;
-
-		ivec2 current;
-		ivec2 pressed;
-		int noteId;
-
-	} state;
+	UIState state;
 	
 	GridUI grids;
 

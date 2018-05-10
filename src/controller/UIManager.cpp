@@ -8,6 +8,7 @@ UIManager::~UIManager() {
 	ofRemoveListener(ofEvents().mouseDragged, this, &UIManager::mouseDragged);
 	ofRemoveListener(ofEvents().mouseReleased, this, &UIManager::mouseReleased);
 	ofRemoveListener(ofEvents().keyPressed, this, &UIManager::keyPressed);
+	ofRemoveListener(ofEvents().mouseScrolled, this, &UIManager::mouseScrolled);
 }
 
 void UIManager::setup(ScoreManager& score, Sequencer& sequencer) {
@@ -21,15 +22,17 @@ void UIManager::setup(ScoreManager& score, Sequencer& sequencer) {
 	ofAddListener(ofEvents().mouseDragged, this, &UIManager::mouseDragged);
 	ofAddListener(ofEvents().mouseReleased, this, &UIManager::mouseReleased);
 	ofAddListener(ofEvents().keyPressed, this, &UIManager::keyPressed);
+	ofAddListener(ofEvents().mouseScrolled, this, &UIManager::mouseScrolled);
 
 	grids = GridUI(CHANNEL, BAR, PITCH, BEAT);
 	grids.setBar(0);
 	grids.setChan(0);
+	this->score->setCurrent(0, 0);
 
-	state.code = State::Code::FREE;
+	state.setup(grids, score);
 }
 
-void UIManager::draw(int offsetX, int offsetY) {
+void UIManager::draw(int offsetX, int offsetY) const {
 	
 	// text info
 	int w = 160;
@@ -55,7 +58,7 @@ void UIManager::draw(int offsetX, int offsetY) {
 	drawGrid();
 	
 	// mouse
-	if (state.code != State::Code::FREE) {
+	if (state.code != UIState::Code::FREE) {
 		ofDrawBitmapString("(" + ofToString(state.current.x) + "," + ofToString(state.current.y) + ")", ofGetMouseX(), ofGetMouseY());
 	}
 }
@@ -80,7 +83,7 @@ ivec2 UIManager::translateMousePos(int x, int y) {
 
 }
 
-void UIManager::drawGrid() {
+void UIManager::drawGrid() const {
 	ofPushMatrix();
 	ofPushStyle();
 
@@ -111,9 +114,8 @@ void UIManager::drawGrid() {
 		ofDrawBitmapString(ofToString(bar) + "." + ofToString(i/4), i * gridSize, PITCH * gridSize + 8);
 	}
 
-
 	// draw notes
-	auto& pairs = score->get(grids.getChan(), grids.getBar());
+	auto& pairs = score->get();
 	for (auto& pair : pairs) {
 		int y = pair.second.pitch;
 		int x = pair.second.beatNum;
@@ -127,20 +129,21 @@ void UIManager::drawGrid() {
 	}
 
 	// drag info
-	if (state.code == State::Code::DRAG_CREATE) {
+	if (state.code == UIState::Code::DRAG_CREATE) {
 		
 		int duration = abs(state.pressed.x - state.current.x) + 1;
 		int x = state.pressed.x < state.current.x ? state.pressed.x : state.current.x;
 		int y = state.pressed.y;
 		int offset = (128.f - defaultVelocity) / 128.f * gridSize * 0.5;
 
-		ofColor& c = grids.getColor(0);
+		auto& c = grids.getColor(0);
 		ofSetColor(c.r, c.g, c.b, 128);
 		ofDrawRectangle(
 			offset + x * gridSize, offset + y * gridSize,
 			gridSize * duration - offset * 2, gridSize - offset * 2);
-	} else if (state.code == State::Code::HOVER_NOTE) {
-		auto& pair = score->get(grids.getChan(), grids.getBar(), state.noteId);
+
+	} else if (state.code == UIState::Code::HOVER_NOTE) {
+		auto& pair = score->get(state.noteId);
 		int y = pair.pitch;
 		int x = pair.beatNum;
 		int d = pair.duration;
@@ -175,132 +178,66 @@ void UIManager::drawGrid() {
 }
 
 void UIManager::mouseMoved(ofMouseEventArgs& args) {
-
-	state.current = translateMousePos(args.x, args.y);
-	bool isHoverOnGrid = !any(lessThan(state.current, ivec2(0)));
-
-	switch (state.code) {
-	case State::Code::FREE:
-		if (isHoverOnGrid) {	
-			state.noteId = grids.get()[state.current.x][state.current.y];
-			if (state.noteId < 0) {
-				state.code = State::Code::HOVER_EMPTY;
-			} else {
-				state.code = State::Code::HOVER_NOTE;
-			}
-		}
-		break;
-	case State::Code::HOVER_EMPTY:
-		if (isHoverOnGrid) {
-			state.noteId = grids.get()[state.current.x][state.current.y];
-			if (state.noteId != -1) {
-				state.code = State::Code::HOVER_NOTE;
-			}
-		} else {
-			state.code = State::Code::FREE;
-		}
-		break;
-	case State::Code::HOVER_NOTE:
-		if (isHoverOnGrid) {
-			state.noteId = grids.get()[state.current.x][state.current.y];
-			if (state.noteId == -1) {
-				state.code = State::Code::HOVER_EMPTY;
-			}
-		} else {
-			state.code = State::Code::FREE;
-		}
-		break;
-	default: break;
-	}
-
+	ivec2 index = translateMousePos(args.x, args.y);
+	state.onMouseMoved(args.x, args.y, index);
 }
 
 void UIManager::mousePressed(ofMouseEventArgs& args) {
-
-	state.pressed = state.current;
-
-	switch (state.code) {
-	case State::Code::HOVER_EMPTY:
-		state.code = State::Code::DRAG_CREATE;
-		break;
-	case State::Code::HOVER_NOTE:
-		state.code = State::Code::DRAG_EDIT;
-		break;
-	default: break;
-	}
-
+	state.onMousePressed();
 }
 
 void UIManager::mouseDragged(ofMouseEventArgs& args) {
-	
 	ivec2 index = translateMousePos(args.x, args.y);
-	bool isHoverOnGrid = !any(lessThan(index, ivec2(0)));
-
-	switch (state.code) {
-	case State::Code::DRAG_CREATE:
-		if (isHoverOnGrid) {
-			state.current = index;
-		}
-		break;
-	case State::Code::DRAG_EDIT:
-		if (isHoverOnGrid) {
-			state.current = index;
-		}
-		break;
-	default: break;
-	}
-
+	state.onMouseDragged(args.x, args.y, index);
 }
 
 void UIManager::mouseReleased(ofMouseEventArgs& args) {
-	switch (state.code) {
-	case State::Code::DRAG_CREATE: {
-		// create
-		int duration = abs(state.pressed.x - state.current.x) + 1;
-		int x = state.pressed.x < state.current.x ? state.pressed.x : state.current.x;
-		int y = state.pressed.y;
+	state.onMouseReleased();
+}
 
-		NoteModel n(grids.getChan(), grids.getBar(), x, y, defaultVelocity, duration);
-		int id = score->create(grids.getChan(), grids.getBar(), n);
-		for (int i = 0; i < duration; i++) {
-			grids.get()[x + i][y] = id;
-		}
-
-		// reset
-		state.code = State::Code::HOVER_NOTE;
-		state.pressed = ivec2(-1);
-		state.noteId = id;
-	} break;
-	case State::Code::DRAG_EDIT:
-		// edit
-		
-
-		// reset
-		state.code = State::Code::HOVER_NOTE;
-		state.pressed = ivec2(-1);
-		break;
-	default: break;
-	}
-
+void UIManager::mouseScrolled(ofMouseEventArgs& args) {
+	state.onMouseScrolled(args.scrollY);
 }
 
 void UIManager::keyPressed(ofKeyEventArgs& args) {
+
 	switch (args.key) {
-	case OF_KEY_UP:
-		grids.setChan((grids.getChan()) + 1);
-		break;
-	case OF_KEY_DOWN:
-		grids.setChan((grids.getChan()) - 1);
-		break;
-	case OF_KEY_RIGHT:
-		grids.setBar((grids.getBar()) + 1);
-		break;
-	case OF_KEY_LEFT:
-		grids.setBar((grids.getBar()) - 1);
-		break;
+	case OF_KEY_UP: {
+		int ch = grids.getChan() + 1;
+		if (ch >= CHANNEL) ch -= CHANNEL;
+		else if (ch < 0) ch += CHANNEL;
+
+		grids.setChan(ch);
+		score->setChan(ch);
+	} break;
+	case OF_KEY_DOWN: {
+		int ch = grids.getChan() - 1;
+		if (ch >= CHANNEL) ch -= CHANNEL;
+		else if (ch < 0) ch += CHANNEL;
+
+		grids.setChan(ch);
+		score->setChan(ch);
+	} break;
+	case OF_KEY_RIGHT: {
+		int bar = grids.getBar() + 1;
+		if (bar >= BAR) bar -= BAR;
+		else if (bar < 0) bar += BAR;
+
+		grids.setBar(bar);
+		score->setBar(bar);
+	} break;
+	case OF_KEY_LEFT: {
+		int bar = grids.getBar() - 1;
+		if (bar >= BAR) bar -= BAR;
+		else if (bar < 0) bar += BAR;
+
+		grids.setBar(bar);
+		score->setBar(bar);
+	} break;
 	default:
 		break;
 	}
 
-
 }
+
+

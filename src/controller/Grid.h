@@ -25,21 +25,16 @@ public:
 	GridUI(USHORT ch, USHORT bar, USHORT pitch, USHORT beat) : ch(ch), bar(bar) {
 		data.assign(bar, vector<Grid>(ch, Grid(beat, pitch)));
 	}
-	
+
 	Grid& get() {
 		return data[bar][ch];
 	}
-	
-	void setBar(int bar) {
-		if (bar >= BAR) bar -= BAR;
-		else if (bar < 0) bar += BAR;
 
+	void setBar(int bar) {
 		this->bar = bar;
-		
-	} 
+	}
+
 	void setChan(int ch) {
-		if (ch >= CHANNEL) ch -= CHANNEL;
-		else if (ch < 0) ch += CHANNEL;
 		this->ch = ch;
 
 		float hue = 256 / CHANNEL * ch;
@@ -47,12 +42,12 @@ public:
 		color[1].setHsb(hue, 256 * (1. - 0.1 * 2), 200);
 		color[2].setHsb(hue, 256 * (1. - 0.1 * 3), 200);
 		color[3].setHsb(hue, 256 * (1. - 0.1 * 4), 200);
-		
+
 	}
 
-	int getBar() { return bar; }
-	int getChan() { return ch; }
-	ofColor& getColor(int i) { return color[i]; }
+	int getBar() const { return bar; }
+	int getChan() const { return ch; }
+	const ofColor& getColor(int i) const { return color[i]; }
 
 private:
 	USHORT bar;

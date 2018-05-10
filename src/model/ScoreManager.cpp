@@ -30,47 +30,59 @@ void ScoreManager::bang(USHORT barNum, USHORT beatNum) {
 
 }
 
-int ScoreManager::create(USHORT ch, USHORT barNum, const NoteModel& note) {
+void ScoreManager::setCurrent(USHORT bar, USHORT ch) {
+	currentBar = bar;
+	currentChan = ch;
+}
+
+int ScoreManager::create(const NoteModel& note) {
 	
-	auto& s = midis[barNum][ch][note.beatNum];
+	USHORT b = currentBar;
+	USHORT c = currentChan;
+
+	auto& s = midis[b][c][note.beatNum];
 	s.push_back(std::make_shared<MidiModel>(true, note.velocity, note.pitch));
 	
 	auto& beatAndBar = calcEnd(note.beatNum, note.barNum, note.duration);
-	auto& e = midis[beatAndBar.second][ch][beatAndBar.first];
+	auto& e = midis[beatAndBar.second][c][beatAndBar.first];
 	e.push_back(std::make_shared<MidiModel>(false, 0, note.pitch));
 	
-	int lastId = notes[barNum][ch].size();
-	notes[barNum][ch].emplace(lastId, note);
-	notes[barNum][ch][lastId].midi[0].it = s.cbegin() + s.size() - 1;
-	notes[barNum][ch][lastId].midi[1].it = e.cbegin() + e.size() - 1;
+	int lastId = notes[b][c].size();
+	notes[b][c].emplace(lastId, note);
+	notes[b][c][lastId].midi[0].it = s.cbegin() + s.size() - 1;
+	notes[b][c][lastId].midi[1].it = e.cbegin() + e.size() - 1;
 
 	return lastId;
 }
 
-NoteModel& ScoreManager::get(USHORT ch, USHORT barNum, int id) {
-	return notes[barNum][ch][id];
+NoteModel& ScoreManager::get(int id) {
+	return notes[currentBar][currentChan][id];
 }
 
-std::unordered_map<int, NoteModel>& ScoreManager::get(USHORT ch, USHORT barNum) {
-	return notes[barNum][ch];
+std::unordered_map<int, NoteModel>& ScoreManager::get() {
+	return notes[currentBar][currentChan];
 }
 
-int ScoreManager::update(USHORT ch, USHORT barNum, int id, const NoteModel& note) {
-	remove(ch, barNum, id);
-	return create(ch, barNum, note);
+int ScoreManager::update(int id, const NoteModel& note) {
+	remove(id);
+	return create(note);
 }
 
-void ScoreManager::remove(USHORT ch, USHORT barNum, int id) {
-	NoteModel& note = notes[ch][barNum][id];
+void ScoreManager::remove(int id) {
+
+	USHORT b = currentBar;
+	USHORT c = currentChan;
+
+	NoteModel& note = notes[b][c][id];
 	auto& beatAndBar = calcEnd(note.beatNum, note.barNum, note.duration);
 
-	midis[barNum][ch][note.beatNum].erase(note.midi[0].it);
-	midis[beatAndBar.second][ch][beatAndBar.first].erase(note.midi[1].it);
+	midis[b][c][note.beatNum].erase(note.midi[0].it);
+	midis[beatAndBar.second][c][beatAndBar.first].erase(note.midi[1].it);
 	
-	notes[ch][barNum].erase(id);
+	notes[b][c].erase(id);
 }
 
-std::pair<USHORT, USHORT> ScoreManager::calcEnd(USHORT startBeat, USHORT startBar, USHORT duration) {
+std::pair<USHORT, USHORT> ScoreManager::calcEnd(USHORT startBeat, USHORT startBar, USHORT duration) const {
 	
 	USHORT endBeat = startBeat + duration;
 	USHORT endBar = startBar;
