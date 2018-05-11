@@ -29,6 +29,8 @@ private:
 
 	ivec2 translateMousePos(int x, int y);
 	void drawGrid() const;
+	void drawStateInfo() const;
+	bool isMouseFormer(int x) const;
 
 	ScoreManager * score;
 	Sequencer * sequencer;

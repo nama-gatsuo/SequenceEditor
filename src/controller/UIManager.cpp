@@ -58,11 +58,6 @@ void UIManager::draw(int offsetX, int offsetY) {
 	// grid
 	drawGrid();
 	
-	// mouse
-	if (state.code != UIState::Code::FREE) {
-		ofDrawBitmapString("(" + ofToString(state.current.x) + "," + ofToString(state.current.y) + ")", ofGetMouseX(), ofGetMouseY());
-	}
-
 	// channel info gui
 	bool isDraw = true;
 	ImGuiWindowFlags window_flags = 0;
@@ -70,6 +65,16 @@ void UIManager::draw(int offsetX, int offsetY) {
 	gui.begin();
 	ImGui::Begin("Channels", &isDraw, window_flags);
 	score->drawChannelInfo();
+	ImGui::End();
+
+	ImGui::Begin("Global", &isDraw, window_flags);
+	int bar = BAR;
+	ImGui::SliderInt("Loop", &bar, 1, 4);
+	BAR = bar;
+
+	int bpm = sequencer->getBpm();
+	ImGui::SliderInt("BPM", &bpm, 80, 145);
+	if (bpm != sequencer->getBpm()) sequencer->setBpm(bpm);
 	ImGui::End();
 	gui.end();
 
@@ -129,8 +134,8 @@ void UIManager::drawGrid() const {
 	// draw notes
 	auto& pairs = score->get();
 	for (auto& pair : pairs) {
-		int y = pair.second.pitch;
-		int x = pair.second.beatNum;
+		int y = pair.second.y;
+		int x = pair.second.x;
 		int duration = pair.second.duration;
 		int offset = (128.f - pair.second.velocity) / 128.f * gridSize * 0.5;
 
@@ -141,8 +146,21 @@ void UIManager::drawGrid() const {
 	}
 
 	// drag info
-	if (state.code == UIState::Code::DRAG_CREATE) {
-		
+	drawStateInfo();
+
+	ofPopStyle();
+	ofPopMatrix();
+	
+}
+
+void UIManager::drawStateInfo() const {
+
+	switch (state.code) {
+	case UIState::Code::HOVER_EMPTY: {
+		ofSetColor(255, 64);
+		ofDrawRectangle(state.current.x * gridSize, state.current.y * gridSize, gridSize, gridSize);
+	} break;
+	case UIState::Code::DRAG_CREATE: {
 		int duration = abs(state.pressed.x - state.current.x) + 1;
 		int x = state.pressed.x < state.current.x ? state.pressed.x : state.current.x;
 		int y = state.pressed.y;
@@ -153,54 +171,59 @@ void UIManager::drawGrid() const {
 		ofDrawRectangle(
 			offset + x * gridSize, offset + y * gridSize,
 			gridSize * duration - offset * 2, gridSize - offset * 2);
-
-	} else if (state.code == UIState::Code::HOVER_NOTE) {
-		auto& pair = score->get(state.noteId);
-		int y = pair.pitch;
-		int x = pair.beatNum;
-		int d = pair.duration;
-		
+	} break;
+	case UIState::Code::HOVER_NOTE: {
+		auto& n = score->get(state.noteId);
+		int d = n.duration;
 
 		ofSetColor(255);
-		int x1 = x * gridSize;
-		int x2 = (0.5 + x) * gridSize;
-		int y1 = (0.5 + y) * gridSize;
-		int y2 = (1 + y) * gridSize;
+		int x1 = n.x * gridSize;
+		int x2 = (0.5 + n.x) * gridSize;
+		int y1 = (0.5 + n.y) * gridSize;
+		int y2 = (1 + n.y) * gridSize;
+		int offset = (128.f - n.velocity) / 128.f * gridSize * 0.5;
 
-		ofDrawLine(x1, y1, x1, y2);
+		ofNoFill();
+		ofDrawRectangle(
+			offset + n.x * gridSize, offset + n.y * gridSize,
+			gridSize * d - offset * 2, gridSize - offset * 2);
+
+		ofDrawRectangle(x1, y1, 0.5 * gridSize, 0.5 * gridSize);
 		ofDrawLine(x1, y1, x2, y2);
-		ofDrawLine(x1, y1, x2, y1);
-		ofDrawLine(x1, y2, x2, y1);
-		ofDrawLine(x1, y2, x2, y2);
-		ofDrawLine(x2, y1, x2, y2);
 
-		x1 = (x + d - 0.25) * gridSize;
-		x2 = (x + d) * gridSize;
-		y1 = y * gridSize;
-		y2 = (y + 1) * gridSize;
-		ofDrawLine(x1, y1, x1, y2);
-		ofDrawLine(x1, y1, x2, y1);
-		ofDrawLine(x1, y2, x2, y2);
-		ofDrawLine(x2, y1, x2, y2);
+		ofDrawBitmapString("velocity: " + ofToString(n.velocity), x2 + 2, y2);
+		//ofDrawBitmapString("id: " + ofToString(state.noteId), x2, y1);
+	} break;
+	case UIState::Code::DRAG_EDIT:
+		
+		auto& n = score->get(state.noteId);
+		int d = state.current.x - n.x + 1;
+		if (d < 1) d = 1;
+
+		int offset = (128.f - n.velocity) / 128.f * gridSize * 0.5;
+		ofSetColor(255, 200);
+		ofNoFill();
+		ofDrawRectangle(
+			offset + n.x * gridSize, offset + n.y * gridSize,
+			gridSize * d - offset * 2, gridSize - offset * 2);
+		
+		break;
 	}
 
-	ofPopStyle();
-	ofPopMatrix();
-	
 }
 
 void UIManager::mouseMoved(ofMouseEventArgs& args) {
 	ivec2 index = translateMousePos(args.x, args.y);
-	state.onMouseMoved(args.x, args.y, index);
+	state.onMouseMoved(index);
 }
 
 void UIManager::mousePressed(ofMouseEventArgs& args) {
-	state.onMousePressed();
+	state.onMousePressed(isMouseFormer(args.x));
 }
 
 void UIManager::mouseDragged(ofMouseEventArgs& args) {
 	ivec2 index = translateMousePos(args.x, args.y);
-	state.onMouseDragged(args.x, args.y, index);
+	state.onMouseDragged(index);
 }
 
 void UIManager::mouseReleased(ofMouseEventArgs& args) {
@@ -252,4 +275,8 @@ void UIManager::keyPressed(ofKeyEventArgs& args) {
 
 }
 
+bool UIManager::isMouseFormer(int x) const {
+	x -= startPos.x;
+	return (x / (int)(gridSize * 0.5)) % 2 == 0;
+}
 

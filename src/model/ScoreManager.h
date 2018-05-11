@@ -26,9 +26,9 @@ public:
 	void drawChannelInfo();
 
 	// setter & getter
-	USHORT getBeat() { return beat; }
-	USHORT getBarCount() { return barCount; }
-	USHORT getChannelCount() { return channelCount; }
+	USHORT getBeat() const { return beat; }
+	USHORT getBarCount() const { return barCount; }
+	USHORT getChannelCount() const { return channelCount; }
 
 	static USHORT beat;
 	static USHORT barCount;

@@ -42,6 +42,9 @@ public:
 			color[i].setHsb(hue, 256 * (0.7 - 0.1 * i), 255);
 		}
 
+		ofColor c;
+		c.setHsb(hue, 255, 50);
+		ofBackground(c);
 	}
 
 	int getBar() const { return bar; }

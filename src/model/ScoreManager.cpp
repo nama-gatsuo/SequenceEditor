@@ -9,16 +9,14 @@ void ScoreManager::setup(USHORT beat, USHORT barCount, USHORT pitchCount) {
 	this->beat = beat;
 	this->barCount = barCount;
 	this->pitchCount = pitchCount;
-	this->channelCount = 16;
-
-	midis.assign(this->barCount, vector<BarModel>(this->channelCount));
-	notes.assign(this->barCount, vector<std::unordered_map<int, NoteModel>>(this->channelCount));
+	channelCount = 0;
 	
 	// load from json
 	ofJson json = ofLoadJson("json/channelInfo.json");
+	
 	if (!json.empty()) {
 		ofLogNotice("json count: ") << json.size();
-		//this->channelCount = (USHORT)json.size();
+		channelCount = json.size();
 		
 		int i = 0;
 		for (auto& data : json) {
@@ -33,8 +31,13 @@ void ScoreManager::setup(USHORT beat, USHORT barCount, USHORT pitchCount) {
 			
 			i++;
 		}
-
+		
+	} else {
+		channelCount = 16;
 	}
+
+	midis.assign(this->barCount, vector<BarModel>(channelCount));
+	notes.assign(this->barCount, vector<std::unordered_map<int, NoteModel>>(channelCount));
 
 	// create scale
 	ChannelInfo::scaleStep.assign(5, vector<int>());
@@ -48,26 +51,29 @@ void ScoreManager::bang(USHORT barNum, USHORT beatNum) {
 
 	USHORT ch = 0;
 	for (BarModel& bar : midis[barNum]) {
-		
-		auto& info = chanInfos[ch];
-		
-		for (MidiModel::Ptr& note : bar[beatNum]) {
-
-			// midi translate
+		if (!bar[beatNum].empty()) {
+			
+			auto& info = chanInfos[ch];
 			int octave = info.octave + 2;
 			int key = static_cast<int>(info.key);
 			int si = static_cast<int>(info.scale);
-
 			int ss = ChannelInfo::scaleStep[si].size();
-			int yo = (note->pitch / ss + octave) * 12 + key;
+
+			for (auto& pair : bar[beatNum]) {
+				auto& note = pair.second;
+
+				// midi translate
+				int yo = (note->y / ss + octave) * 12 + key;
+				int yp = ChannelInfo::scaleStep[si][note->y % ss];
+
+				if (note->isAttack) sender.sendMidiOn(ch + 1, yo + yp, note->velocity);
+				else sender.sendMidiOff(ch + 1, yo + yp);
+
+			}
 			
-			int yp = ChannelInfo::scaleStep[si][note->pitch % ss];
-
-			if (note->isAttack) sender.sendMidiOn(ch+1, yo + yp, note->velocity);
-			else sender.sendMidiOff(ch+1, yo + yp);
-
 		}
 		ch++;
+		
 	}
 
 }
@@ -82,19 +88,21 @@ int ScoreManager::create(const NoteModel& note) {
 	USHORT b = currentBar;
 	USHORT c = currentChan;
 
-	auto& s = midis[b][c][note.beatNum];
-	s.push_back(std::make_shared<MidiModel>(true, note.velocity, note.pitch));
+	// y value (pitch) is Key of map
+	auto& s = midis[b][c][note.x];
+	s.emplace(note.y + pitchCount, std::make_shared<MidiModel>(true, note.velocity, note.y));
 	
-	auto& beatAndBar = calcEnd(note.beatNum, note.barNum, note.duration);
+	auto& beatAndBar = calcEnd(note.x, note.barNum, note.duration);
 	auto& e = midis[beatAndBar.second][c][beatAndBar.first];
-	e.push_back(std::make_shared<MidiModel>(false, 0, note.pitch));
+	e.emplace(note.y, std::make_shared<MidiModel>(false, 0, note.y));
 	
-	int lastId = notes[b][c].size();
-	notes[b][c].emplace(lastId, note);
-	notes[b][c][lastId].midi[0].it = s.cbegin() + s.size() - 1;
-	notes[b][c][lastId].midi[1].it = e.cbegin() + e.size() - 1;
+	// id is specified with xy-coord in board
+	int id = note.x * 16 + note.y;
+	notes[b][c].emplace(id, note);
+	notes[b][c][id].midiId[0] = note.y + pitchCount;
+	notes[b][c][id].midiId[1] = note.y;
 
-	return lastId;
+	return id;
 }
 
 NoteModel& ScoreManager::get(int id) {
@@ -106,7 +114,7 @@ std::unordered_map<int, NoteModel>& ScoreManager::get() {
 }
 
 int ScoreManager::update(int id, const NoteModel& note) {
-	remove(id);
+	remove(id); // deleted note reference
 	return create(note);
 }
 
@@ -115,11 +123,14 @@ void ScoreManager::remove(int id) {
 	USHORT b = currentBar;
 	USHORT c = currentChan;
 
-	NoteModel& note = notes[b][c][id];
-	auto& beatAndBar = calcEnd(note.beatNum, note.barNum, note.duration);
+	NoteModel& n = notes[b][c][id];
+	auto& beatAndBar = calcEnd(n.x, n.barNum, n.duration);
 
-	midis[b][c][note.beatNum].erase(note.midi[0].it);
-	midis[beatAndBar.second][c][beatAndBar.first].erase(note.midi[1].it);
+	auto& s = midis[b][c][n.x];
+	s.erase(n.midiId[0]);
+
+	auto& e = midis[beatAndBar.second][c][beatAndBar.first];
+	e.erase(n.midiId[1]);
 	
 	notes[b][c].erase(id);
 }
@@ -142,6 +153,5 @@ std::pair<USHORT, USHORT> ScoreManager::calcEnd(USHORT startBeat, USHORT startBa
 void ScoreManager::drawChannelInfo() {
 	for (auto& info : chanInfos) {
 		info.drawGui();
-	}
-	
+	}	
 }
