@@ -4,9 +4,9 @@ std::vector<vector<int>> ChannelInfo::scaleStep;
 
 ChannelInfo::ChannelInfo() {}
 
-ChannelInfo::ChannelInfo(SHORT i, const string& name) : chIndex(i) {
+ChannelInfo::ChannelInfo(int i, const string& name) : chIndex(i) {
 	chNumInDAW = chIndex + 1;
-	this->name = "ch[" + ofToString(chIndex) + "]: " + name;
+	this->name = "ch[" + ofToString(i) + "]: " + name;
 	
 	float hue = 1.f / 16 * chIndex;
 	for (int i = 0; i < colors.size(); i++) {
@@ -19,7 +19,9 @@ void ChannelInfo::drawGui() {
 	ImGui::PushID(chIndex);
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colors[0]);
 	ImGui::PushStyleColor(ImGuiCol_Header, colors[3]);
+
 	if (ImGui::CollapsingHeader(name.data())) {
+
 		ImGui::PushStyleColor(ImGuiCol_CheckMark, colors[0]);
 		ImGui::Checkbox("base", &isActive[0]); ImGui::SameLine();
 		ImGui::PushStyleColor(ImGuiCol_CheckMark, colors[1]);

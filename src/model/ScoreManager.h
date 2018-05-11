@@ -6,17 +6,17 @@
 
 class ScoreManager {
 public:
-	void setup(USHORT beat, USHORT barCount, USHORT pitchCount);
+	void setup(UCHAR beat, UCHAR barCount, UCHAR pitchCount);
 	void loadJson(const string& file) {}
 
 	// for sequencer IF
-	void bang(USHORT barNum, USHORT beatNum);
+	void bang(UCHAR barNum, UCHAR beatNum);
 
 	// for UI IF: CRUD
 	// return id
-	void setBar(USHORT bar) { currentBar = bar; }
-	void setChan(USHORT ch) { currentChan = ch; }
-	void setCurrent(USHORT bar, USHORT ch);
+	void setBar(UCHAR bar) { currentBar = bar; }
+	void setChan(UCHAR ch) { currentChan = ch; }
+	void setCurrent(UCHAR bar, UCHAR ch);
 	int create(const NoteModel& note);
 	NoteModel& get(int id);
 	std::unordered_map<int, NoteModel>& get();
@@ -26,20 +26,20 @@ public:
 	void drawChannelInfo();
 
 	// setter & getter
-	USHORT getBeat() const { return beat; }
-	USHORT getBarCount() const { return barCount; }
-	USHORT getChannelCount() const { return channelCount; }
+	UCHAR getBeat() const { return beat; }
+	UCHAR getBarCount() const { return barCount; }
+	UCHAR getChannelCount() const { return channelCount; }
 
-	static USHORT beat;
-	static USHORT barCount;
-	static USHORT channelCount;
-	static USHORT pitchCount;
+	static UCHAR beat;
+	static UCHAR barCount;
+	static UCHAR channelCount;
+	static UCHAR pitchCount;
 
 private:
-	std::pair<USHORT, USHORT> calcEnd(USHORT startBeat, USHORT startBar, USHORT duration) const;
+	std::pair<UCHAR, UCHAR> calcEnd(UCHAR startBeat, UCHAR startBar, UCHAR duration) const;
 
-	USHORT currentBar;
-	USHORT currentChan;
+	UCHAR currentBar;
+	UCHAR currentChan;
 
 	// bar:     4 bars
 	// channel: 16 instruments

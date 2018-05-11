@@ -8,7 +8,7 @@ class Sequencer {
 public:
 	Sequencer() : globalBeat(0), currentBeat(0), currentBar(0), bpm(120) {}
 
-	void init(ScoreManager& scoreManager, USHORT bpm) {
+	void init(ScoreManager& scoreManager, UINT bpm) {
 		score = &scoreManager;
 		setBpm(bpm);
 
@@ -30,11 +30,11 @@ public:
 	
 	}
 	
-	USHORT getCurrentBeat() const { return currentBeat; }
-	USHORT getCurrentBar() const { return currentBar; }
-	USHORT getBpm() const { return bpm; }
+	UCHAR getCurrentBeat() const { return currentBeat; }
+	UCHAR getCurrentBar() const { return currentBar; }
+	UINT getBpm() const { return bpm; }
 	
-	void setBpm(USHORT bpm) {
+	void setBpm(UINT bpm) {
 		this->bpm = bpm;
 		rhythm.setDelta(15000 / bpm);
 	}
@@ -45,7 +45,7 @@ private:
 	RhythmMachine rhythm;
 
 	ULONG globalBeat;
-	USHORT currentBeat;
-	USHORT currentBar;
-	USHORT bpm;
+	UCHAR currentBeat;
+	UCHAR currentBar;
+	UINT bpm;
 };

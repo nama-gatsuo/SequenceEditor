@@ -2,7 +2,7 @@
 
 class ScoreManager;
 
-static USHORT& BEAT = ScoreManager::beat;
-static USHORT& BAR = ScoreManager::barCount;
-static USHORT& CHANNEL = ScoreManager::channelCount;
-static USHORT& PITCH = ScoreManager::pitchCount;
+static UCHAR& BEAT = ScoreManager::beat;
+static UCHAR& BAR = ScoreManager::barCount;
+static UCHAR& CHANNEL = ScoreManager::channelCount;
+static UCHAR& PITCH = ScoreManager::pitchCount;

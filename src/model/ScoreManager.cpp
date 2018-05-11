@@ -1,11 +1,11 @@
 #include "ScoreManager.h"
 
-USHORT ScoreManager::beat = 0;
-USHORT ScoreManager::barCount = 0;
-USHORT ScoreManager::channelCount = 0;
-USHORT ScoreManager::pitchCount = 0;
+UCHAR ScoreManager::beat = 0;
+UCHAR ScoreManager::barCount = 0;
+UCHAR ScoreManager::channelCount = 0;
+UCHAR ScoreManager::pitchCount = 0;
 
-void ScoreManager::setup(USHORT beat, USHORT barCount, USHORT pitchCount) {
+void ScoreManager::setup(UCHAR beat, UCHAR barCount, UCHAR pitchCount) {
 	this->beat = beat;
 	this->barCount = barCount;
 	this->pitchCount = pitchCount;
@@ -47,9 +47,9 @@ void ScoreManager::setup(USHORT beat, USHORT barCount, USHORT pitchCount) {
 	ChannelInfo::scaleStep[3] = { 0, 2, 4, 7, 9 };
 }
 
-void ScoreManager::bang(USHORT barNum, USHORT beatNum) {
+void ScoreManager::bang(UCHAR barNum, UCHAR beatNum) {
 
-	USHORT ch = 0;
+	UCHAR ch = 0;
 	for (BarModel& bar : midis[barNum]) {
 		if (!bar[beatNum].empty()) {
 			
@@ -78,15 +78,15 @@ void ScoreManager::bang(USHORT barNum, USHORT beatNum) {
 
 }
 
-void ScoreManager::setCurrent(USHORT bar, USHORT ch) {
+void ScoreManager::setCurrent(UCHAR bar, UCHAR ch) {
 	currentBar = bar;
 	currentChan = ch;
 }
 
 int ScoreManager::create(const NoteModel& note) {
 	
-	USHORT b = currentBar;
-	USHORT c = currentChan;
+	UCHAR b = currentBar;
+	UCHAR c = currentChan;
 
 	// y value (pitch) is Key of map
 	auto& s = midis[b][c][note.x];
@@ -120,8 +120,8 @@ int ScoreManager::update(int id, const NoteModel& note) {
 
 void ScoreManager::remove(int id) {
 
-	USHORT b = currentBar;
-	USHORT c = currentChan;
+	UCHAR b = currentBar;
+	UCHAR c = currentChan;
 
 	NoteModel& n = notes[b][c][id];
 	auto& beatAndBar = calcEnd(n.x, n.barNum, n.duration);
@@ -135,10 +135,10 @@ void ScoreManager::remove(int id) {
 	notes[b][c].erase(id);
 }
 
-std::pair<USHORT, USHORT> ScoreManager::calcEnd(USHORT startBeat, USHORT startBar, USHORT duration) const {
+std::pair<UCHAR, UCHAR> ScoreManager::calcEnd(UCHAR startBeat, UCHAR startBar, UCHAR duration) const {
 	
-	USHORT endBeat = startBeat + duration;
-	USHORT endBar = startBar;
+	UCHAR endBeat = startBeat + duration;
+	UCHAR endBar = startBar;
 	if (endBeat >= beat) {
 		endBeat -= beat;
 		endBar++;

@@ -45,8 +45,6 @@ void UIManager::draw(int offsetX, int offsetY) {
 
 	ofDrawBitmapString("bpm: " + ofToString(sequencer->getBpm()), offsetX, offsetY + lh * (++h));
 	ofDrawBitmapString("bar: " + ofToString(sequencer->getCurrentBar()), offsetX, offsetY + lh * (++h));
-	ofDrawBitmapString("beat: " + ofToString(sequencer->getCurrentBeat()), offsetX, offsetY + lh * (++h));
-	ofDrawBitmapString("delta: " + ofToString(sequencer->getDelta()), offsetX, offsetY + lh * (++h));
 	h++;
 	ofDrawBitmapString("fps: " + ofToString(ofGetFrameRate()), offsetX, offsetY + lh * (++h));
 
@@ -117,9 +115,9 @@ void UIManager::drawGrid() const {
 	}
 	
 	// rhythm guide
-	USHORT cbeat = sequencer->getCurrentBeat();
-	USHORT cbar = sequencer->getCurrentBar();
-	USHORT bar = grids.getBar();
+	UCHAR cbeat = sequencer->getCurrentBeat();
+	UCHAR cbar = sequencer->getCurrentBar();
+	UCHAR bar = grids.getBar();
 	
 	if (cbar == bar) {
 		int o = 8;
@@ -128,7 +126,7 @@ void UIManager::drawGrid() const {
 
 	ofSetColor(255);
 	for (int i = 0; i < BEAT; i += 4) {
-		ofDrawBitmapString(ofToString(bar) + "." + ofToString(i/4), i * gridSize, PITCH * gridSize + 8);
+		ofDrawBitmapString(ofToString((int)bar) + "." + ofToString(i/4), i * gridSize, PITCH * gridSize + 8);
 	}
 
 	// draw notes
@@ -191,7 +189,7 @@ void UIManager::drawStateInfo() const {
 		ofDrawRectangle(x1, y1, 0.5 * gridSize, 0.5 * gridSize);
 		ofDrawLine(x1, y1, x2, y2);
 
-		ofDrawBitmapString("velocity: " + ofToString(n.velocity), x2 + 2, y2);
+		ofDrawBitmapString("velocity: " + ofToString((int)n.velocity), x2 + 2, y2);
 		//ofDrawBitmapString("id: " + ofToString(state.noteId), x2, y1);
 	} break;
 	case UIState::Code::DRAG_EDIT:

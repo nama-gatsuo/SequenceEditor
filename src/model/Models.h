@@ -4,16 +4,19 @@
 struct MidiModel {
 	using Ptr = std::shared_ptr<MidiModel>;
 
-	MidiModel(bool isAttack, USHORT velocity, USHORT y) : isAttack(isAttack), velocity(velocity), y(y) {}
+	MidiModel(bool isAttack, UCHAR velocity, UCHAR y) :
+		isAttack(isAttack), velocity(velocity), y(y) {}
+	
 	bool isAttack;
-	USHORT velocity;
-	USHORT y;
+	UCHAR velocity;
+	UCHAR y;
+	UCHAR level;
 };
 
 struct NoteModel {
 	
 	NoteModel() {}
-	NoteModel(USHORT ch, USHORT barNum, USHORT x, USHORT y, USHORT velocity, USHORT duration) :
+	NoteModel(UCHAR ch, UCHAR barNum, UCHAR x, UCHAR y, UCHAR velocity, UCHAR duration) :
 		ch(ch), duration(duration), barNum(barNum), x(x), y(y), velocity(velocity){}
 	NoteModel(const NoteModel& n) {
 		ch = n.ch;
@@ -22,21 +25,23 @@ struct NoteModel {
 		x = n.x;
 		y = n.y;
 		velocity = n.velocity;
+		level = n.level;
 	}
 
-	USHORT ch;
-	USHORT duration;
-	USHORT barNum;
-	USHORT x;
-	USHORT y;
-	USHORT velocity;
+	UCHAR ch;
+	UCHAR duration;
+	UCHAR barNum;
+	UCHAR x;
+	UCHAR y;
+	UCHAR velocity;
+	UCHAR level; // note layer 0 - 3
 
 	std::array<int, 2> midiId;
 };
 
 class BarModel {
 public:
-	using Map = std::map<USHORT, MidiModel::Ptr>;
+	using Map = std::map<UCHAR, MidiModel::Ptr>;
 
 	BarModel() {}
 

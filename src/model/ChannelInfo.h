@@ -5,7 +5,7 @@
 class ChannelInfo {
 public:
 	ChannelInfo();
-	ChannelInfo(SHORT i, const string& name);
+	ChannelInfo(int i, const string& name);
 
 	enum Scale {
 		CHROMATIC = 0, MAJOR, MINOR, PENTATONIC
@@ -20,8 +20,8 @@ public:
 	
 	static std::vector<vector<int>> scaleStep;
 
-	USHORT chIndex;
-	USHORT chNumInDAW;
+	UCHAR chIndex;
+	UCHAR chNumInDAW;
 	string name;
 	
 	array<bool, 4> isActive;

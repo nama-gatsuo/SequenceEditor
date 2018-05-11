@@ -11,7 +11,7 @@ void UIState::onMouseMoved(const ivec2& index) {
 	
 	current = index;
 
-	bool isHoverOnGrid = !any(lessThan(current, ivec2(0)));
+	bool isHoverOnGrid = !all(lessThan(current, ivec2(0)));
 
 	switch (code) {
 	case Code::FREE:
