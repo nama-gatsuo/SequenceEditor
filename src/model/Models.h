@@ -4,8 +4,8 @@
 struct MidiModel {
 	using Ptr = std::shared_ptr<MidiModel>;
 
-	MidiModel(bool isAttack, UCHAR velocity, UCHAR y) :
-		isAttack(isAttack), velocity(velocity), y(y) {}
+	MidiModel(bool isAttack, UCHAR velocity, UCHAR y, UCHAR level) :
+		isAttack(isAttack), velocity(velocity), y(y), level(level) {}
 	
 	bool isAttack;
 	UCHAR velocity;
@@ -16,8 +16,8 @@ struct MidiModel {
 struct NoteModel {
 	
 	NoteModel() {}
-	NoteModel(UCHAR ch, UCHAR barNum, UCHAR x, UCHAR y, UCHAR velocity, UCHAR duration) :
-		ch(ch), duration(duration), barNum(barNum), x(x), y(y), velocity(velocity){}
+	NoteModel(UCHAR ch, UCHAR barNum, UCHAR x, UCHAR y, UCHAR velocity, UCHAR duration, UCHAR level) :
+		ch(ch), duration(duration), barNum(barNum), x(x), y(y), velocity(velocity), level(level) {}
 	NoteModel(const NoteModel& n) {
 		ch = n.ch;
 		duration = n.duration;

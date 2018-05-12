@@ -121,6 +121,7 @@ void UIState::onMouseReleased() {
 			int y = pressed.y;
 			int d = 0;
 
+			// check if there is any notes in new duration
 			for (int i = 0; i < dragLength; i++) {
 				int id = grids->get()[isDragBack ? start + i : start - i][y];
 				if (id > -1) break;
@@ -131,8 +132,7 @@ void UIState::onMouseReleased() {
 			}
 
 			if (isDragBack) x = start;
-
-			NoteModel n(grids->getChan(), grids->getBar(), x, y, 100, d);
+			NoteModel n(grids->getChan(), grids->getBar(), x, y, 100, d, currentEditLevel);
 			int id = score->create(n);
 			for (int i = 0; i < d; i++) {
 				grids->get()[x + i][y] = id;
@@ -157,15 +157,43 @@ void UIState::onMouseReleased() {
 			// copy from reference
 			// because original data will be deleted in score->update()
 			NoteModel n = score->get(noteId);
+			int oldDur = n.duration;
+
+			int newDur = current.x - n.x + 1;
+			if (newDur < 1) newDur = 1;
 			
-			int d = current.x - n.x + 1;
-			if (d < 1) d = 1;
-			n.duration = d;
-			
-			noteId = score->update(noteId, n);
-			for (int x = n.x; x < n.x + n.duration; x++) {
-				grids->get()[x][n.y] = noteId;
+			// check if there is any notes in new duration
+			if (newDur > oldDur) {
+				for (int x = n.x + oldDur + 1; x < n.x + newDur; x++) {
+					int id = grids->get()[x][n.y];
+					if (id != -1) {
+						newDur = x - n.x;
+						break;
+					}
+				}
 			}
+
+			n.duration = newDur;
+
+			noteId = score->update(noteId, n);
+
+			// rewrite ids on the grid
+			if (newDur > oldDur) {
+				for (int x = n.x; x < n.x + newDur; x++) {
+					grids->get()[x][n.y] = noteId;
+				}
+			} else {
+				for (int d = 0; d < oldDur; d++) {
+					if (d < newDur) {
+						grids->get()[n.x + d][n.y] = noteId;
+					} else {
+						grids->get()[n.x + d][n.y] = -1;
+					}
+					
+				}
+			}
+
+			
 
 			code = Code::HOVER_NOTE;
 			pressed = ivec2(-1);

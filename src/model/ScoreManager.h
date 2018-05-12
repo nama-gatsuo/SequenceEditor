@@ -22,7 +22,7 @@ public:
 	std::unordered_map<int, NoteModel>& get();
 	int update(int id, const NoteModel& note);
 	void remove(int id);
-	
+
 	void drawChannelInfo();
 
 	// setter & getter
@@ -44,7 +44,7 @@ private:
 	// bar:     4 bars
 	// channel: 16 instruments
 	vector<vector<BarModel>> midis;
-	
+
 	// bar:     4 bars
 	// channel: 16 instruments
 	// (id, note)

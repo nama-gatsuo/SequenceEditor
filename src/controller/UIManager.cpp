@@ -73,6 +73,12 @@ void UIManager::draw(int offsetX, int offsetY) {
 	int bpm = sequencer->getBpm();
 	ImGui::SliderInt("BPM", &bpm, 80, 145);
 	if (bpm != sequencer->getBpm()) sequencer->setBpm(bpm);
+
+	ImGui::RadioButton("base", &state.currentEditLevel, 0); ImGui::SameLine();
+	ImGui::RadioButton("fill1", &state.currentEditLevel, 1); ImGui::SameLine();
+	ImGui::RadioButton("fill2", &state.currentEditLevel, 2); ImGui::SameLine();
+	ImGui::RadioButton("fill3", &state.currentEditLevel, 3);
+
 	ImGui::End();
 	gui.end();
 
@@ -253,16 +259,16 @@ void UIManager::keyPressed(ofKeyEventArgs& args) {
 	} break;
 	case OF_KEY_RIGHT: {
 		int bar = grids.getBar() + 1;
-		if (bar >= BAR) bar -= BAR;
-		else if (bar < 0) bar += BAR;
+		if (bar >= MAX_BAR) bar -= MAX_BAR;
+		else if (bar < 0) bar += MAX_BAR;
 
 		grids.setBar(bar);
 		score->setBar(bar);
 	} break;
 	case OF_KEY_LEFT: {
 		int bar = grids.getBar() - 1;
-		if (bar >= BAR) bar -= BAR;
-		else if (bar < 0) bar += BAR;
+		if (bar >= MAX_BAR) bar -= MAX_BAR;
+		else if (bar < 0) bar += MAX_BAR;
 
 		grids.setBar(bar);
 		score->setBar(bar);

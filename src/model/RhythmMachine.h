@@ -44,6 +44,5 @@ public:
 
 private:
 	std::condition_variable condition;
-	ofEvent<int> newBeat;
 	int delta;
 };

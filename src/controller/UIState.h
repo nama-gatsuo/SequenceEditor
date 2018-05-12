@@ -14,6 +14,7 @@ public:
 		FREE, HOVER_EMPTY, HOVER_NOTE, DRAG_DELETE, DRAG_CREATE, DRAG_EDIT
 	} code;
 
+	int currentEditLevel;
 	ivec2 current;
 	ivec2 pressed;
 	int noteId;
