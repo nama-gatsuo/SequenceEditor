@@ -44,13 +44,12 @@ void UIManager::draw(int offsetX, int offsetY) {
 	ofSetLineWidth(0.1);
 
 	ofDrawBitmapString("bpm: " + ofToString(sequencer->getBpm()), offsetX, offsetY + lh * (++h));
-	ofDrawBitmapString("bar: " + ofToString(sequencer->getCurrentBar()), offsetX, offsetY + lh * (++h));
 	h++;
 	ofDrawBitmapString("fps: " + ofToString(ofGetFrameRate()), offsetX, offsetY + lh * (++h));
 
 	h = 0;
+	ofDrawBitmapString("channel: " + score->getChannelInfo().name, offsetX + w, offsetY + lh * (++h));
 	ofDrawBitmapString("bar: " + ofToString(grids.getBar()), offsetX + w, offsetY + lh * (++h));
-	ofDrawBitmapString("channel: " + ofToString(grids.getChan()), offsetX + w, offsetY + lh * (++h));
 	ofDrawBitmapString("state: " + ofToString((int)state.code), offsetX + w, offsetY + lh * (++h));
 
 	// grid
@@ -61,6 +60,9 @@ void UIManager::draw(int offsetX, int offsetY) {
 	ImGuiWindowFlags window_flags = 0;
 
 	gui.begin();
+	ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImColor::ImColor(0.));
+	ImGui::PushStyleColor(ImGuiCol_TitleBg, ImColor::ImColor(0.));
+
 	ImGui::Begin("Channels", &isDraw, window_flags);
 	score->drawChannelInfo();
 	ImGui::End();
@@ -80,6 +82,8 @@ void UIManager::draw(int offsetX, int offsetY) {
 	ImGui::RadioButton("fill3", &state.currentEditLevel, 3);
 
 	ImGui::End();
+
+	ImGui::PopStyleColor(2);
 	gui.end();
 
 }
@@ -126,7 +130,12 @@ void UIManager::drawGrid() const {
 	UCHAR bar = grids.getBar();
 	
 	if (cbar == bar) {
-		int o = 8;
+		int o = 4;
+		ofNoFill();
+		ofDrawRectangle(cbeat * gridSize + o, o, gridSize - o * 2, gridSize * (PITCH + 1) - o * 2);
+		
+		o = 8;
+		ofFill();
 		ofDrawRectangle(cbeat * gridSize + o, PITCH * gridSize + o, gridSize - o * 2, gridSize - o * 2);
 	}
 
@@ -135,19 +144,37 @@ void UIManager::drawGrid() const {
 		ofDrawBitmapString(ofToString((int)bar) + "." + ofToString(i/4), i * gridSize, PITCH * gridSize + 8);
 	}
 
+	// pitch guide
+	for (int i = 0; i < CHANNEL; i++) {
+		int midiPitch = score->getChannelInfo().translateMidi(i);
+		ofDrawBitmapString(ofToString(midiPitch), - 20, gridSize * i + 12);
+	}
+
 	// draw notes
 	auto& pairs = score->get();
+	ofPushStyle();
 	for (auto& pair : pairs) {
 		int y = pair.second.y;
 		int x = pair.second.x;
+		UCHAR level = pair.second.level;
+		ChannelInfo ci = score->getChannelInfo();
+		bool isActive = ci.isActive[level];
+
 		int duration = pair.second.duration;
 		int offset = (128.f - pair.second.velocity) / 128.f * gridSize * 0.5;
 
-		ofSetColor(grids.getColor(0));
+		ofSetColor(grids.getColor(level));
+
+		if (ci.isActive[level]) ofFill();
+		else ofNoFill();
+
 		ofDrawRectangle(
 			offset + x * gridSize, offset + y * gridSize,
 			gridSize * duration - offset * 2, gridSize - offset * 2);
+		
+
 	}
+	ofPopStyle();
 
 	// drag info
 	drawStateInfo();

@@ -26,7 +26,8 @@ public:
 	
 	array<bool, 4> isActive;
 	array<ImColor, 4> colors;
+	ImColor colorHeader;
 
 	void drawGui();
-
+	UCHAR translateMidi(int midi) const;
 };

@@ -37,13 +37,13 @@ public:
 	void setChan(UCHAR ch) {
 		this->ch = ch;
 
-		float hue = 256 / CHANNEL * ch;
+		float hue = 256 * (((1. / 3.) * (ch % 3) + (ch / 3) * 0.03) * 0.5 + 0.4);
 		for (int i = 0; i < color.size(); i++) {
-			color[i].setHsb(hue, 256 * (0.7 - 0.1 * i), 255);
+			color[i].setHsb(hue, 256 * (1. - 0.25 * i), 256 * 0.8);
 		}
 
 		ofColor c;
-		c.setHsb(hue, 255, 50);
+		c.setHsb(hue, 255 * 0.4, 255 * 0.2);
 		ofBackground(c);
 	}
 

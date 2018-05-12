@@ -13,7 +13,7 @@ void ofApp::setup() {
 	sequencer.init(score, 120);
 	
 	ui.setup(score, sequencer);
-	ui.setPosition(32, ofGetHeight() - 32);
+	ui.setPosition(64, ofGetHeight() - 64);
 
 }
 

@@ -8,17 +8,24 @@ ChannelInfo::ChannelInfo(int i, const string& name) : chIndex(i) {
 	chNumInDAW = chIndex + 1;
 	this->name = "ch[" + ofToString(i) + "]: " + name;
 	
-	float hue = 1.f / 16 * chIndex;
+	float hue = ((1. / 3.) * (i % 3) + (i / 3) * 0.03) * 0.5 + 0.4;
+	colorHeader = ImColor::HSV(hue, 0.4, 0.4);
 	for (int i = 0; i < colors.size(); i++) {
-		colors[i] = ImColor::HSV(hue, 1. - 0.1 * i, 0.8);
+		colors[i] = ImColor::HSV(hue, 1. - 0.25 * i, 0.8);
 	}
+
+	isActive[0] = true;
+	isActive[1] = false;
+	isActive[2] = false;
+	isActive[3] = false;
+
 }
 
 void ChannelInfo::drawGui() {
 
 	ImGui::PushID(chIndex);
-	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colors[0]);
-	ImGui::PushStyleColor(ImGuiCol_Header, colors[3]);
+	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colorHeader);
+	ImGui::PushStyleColor(ImGuiCol_Header, colorHeader);
 
 	if (ImGui::CollapsingHeader(name.data())) {
 
@@ -47,4 +54,16 @@ void ChannelInfo::drawGui() {
 	ImGui::PopStyleColor(2);
 	ImGui::PopID();
 
+}
+
+UCHAR ChannelInfo::translateMidi(int h) const {
+	int oct = octave + 2;
+	int k = static_cast<int>(key);
+	int si = static_cast<int>(scale);
+	int ss = scaleStep[si].size();
+	
+	int yo = (h / ss + oct) * 12 + k;
+	int yp = ChannelInfo::scaleStep[si][h % ss];
+	
+	return yo + yp;
 }

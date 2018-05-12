@@ -53,24 +53,20 @@ void ScoreManager::bang(UCHAR barNum, UCHAR beatNum) {
 	for (BarModel& bar : midis[barNum]) {
 		if (!bar[beatNum].empty()) {
 
-			auto& info = chanInfos[ch];
-			int octave = info.octave + 2;
-			int key = static_cast<int>(info.key);
-			int si = static_cast<int>(info.scale);
-			int ss = ChannelInfo::scaleStep[si].size();
+			auto& info = getChannelInfo(ch);
 
 			for (auto& pair : bar[beatNum]) {
 				auto& note = pair.second;
 
 				// midi translate
-				int yo = (note->y / ss + octave) * 12 + key;
-				int yp = ChannelInfo::scaleStep[si][note->y % ss];
+				UCHAR midiNote = info.translateMidi(note->y);
 				
-				if (info.isActive[note->level]) {
-					if (note->isAttack) sender.sendMidiOn(ch + 1, yo + yp, note->velocity);
-					else sender.sendMidiOff(ch + 1, yo + yp);
+				if (note->isAttack) {
+					if (info.isActive[note->level]) {
+						sender.sendMidiOn(ch + 1, midiNote, note->velocity);
+					}
 				}
-
+				else sender.sendMidiOff(ch + 1, midiNote);
 			}
 
 		}
