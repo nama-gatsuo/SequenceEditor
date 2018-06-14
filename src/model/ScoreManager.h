@@ -23,8 +23,8 @@ public:
 	int update(int id, const NoteModel& note);
 	void remove(int id);
 
-	const ChannelInfo& getChannelInfo() const { return chanInfos[currentChan]; }
-	const ChannelInfo& getChannelInfo(UCHAR index) const { return chanInfos[index]; }
+	ChannelInfo& getChannelInfo() { return chanInfos[currentChan]; }
+	ChannelInfo& getChannelInfo(UCHAR index) { return chanInfos[index]; }
 
 	void drawChannelInfo();
 

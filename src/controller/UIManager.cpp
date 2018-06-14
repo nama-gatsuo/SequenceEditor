@@ -64,7 +64,7 @@ void UIManager::draw(int offsetX, int offsetY) {
 	ImGui::PushStyleColor(ImGuiCol_TitleBg, ImColor::ImColor(0.));
 
 	ImGui::Begin("Channels", &isDraw, window_flags);
-	score->drawChannelInfo();
+	score->getChannelInfo().drawGui();
 	ImGui::End();
 
 	ImGui::Begin("Global", &isDraw, window_flags);
@@ -76,10 +76,18 @@ void UIManager::draw(int offsetX, int offsetY) {
 	ImGui::SliderInt("BPM", &bpm, 80, 145);
 	if (bpm != sequencer->getBpm()) sequencer->setBpm(bpm);
 
-	ImGui::RadioButton("base", &state.currentEditLevel, 0); ImGui::SameLine();
-	ImGui::RadioButton("fill1", &state.currentEditLevel, 1); ImGui::SameLine();
-	ImGui::RadioButton("fill2", &state.currentEditLevel, 2); ImGui::SameLine();
-	ImGui::RadioButton("fill3", &state.currentEditLevel, 3);
+	ImGui::PushID("active");
+
+	for (int i = 0; i < 4; i++) {
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, score->getChannelInfo().colors[i]);
+		ImGui::PushStyleColor(ImGuiCol_Header, score->getChannelInfo().colors[i]);
+		bool b = state.currentEditLevel == i;
+		if (ImGui::Selectable(ofToString(i).data(), &b, 0, ImVec2(30, 30))) {
+			state.currentEditLevel = i;
+		}
+		if (i != 3) ImGui::SameLine();
+	}
+	ImGui::PopID();
 
 	ImGui::End();
 

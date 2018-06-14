@@ -2,6 +2,7 @@
 #include "ofMain.h"
 #include "ScoreManager.h"
 #include "Grid.h"
+#include "Events.h"
 
 using namespace glm;
 

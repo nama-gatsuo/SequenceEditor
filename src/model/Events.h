@@ -3,5 +3,6 @@
 
 struct EventsEntity {
 	static ofEvent<bool> newBeat;
+	static ofEvent<int> editTarget;
 };
 

@@ -19,6 +19,7 @@ ChannelInfo::ChannelInfo(int i, const string& name) : chIndex(i) {
 	isActive[2] = false;
 	isActive[3] = false;
 
+	ofAddListener(EventsEntity::editTarget, this, &ChannelInfo::setEditTarget);
 }
 
 void ChannelInfo::drawGui() {
@@ -26,32 +27,36 @@ void ChannelInfo::drawGui() {
 	ImGui::PushID(chIndex);
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colorHeader);
 	ImGui::PushStyleColor(ImGuiCol_Header, colorHeader);
-
-	if (ImGui::CollapsingHeader(name.data())) {
-
-		ImGui::PushStyleColor(ImGuiCol_CheckMark, colors[0]);
-		ImGui::Checkbox("base", &isActive[0]); ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_CheckMark, colors[1]);
-		ImGui::Checkbox("fill1", &isActive[1]); ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_CheckMark, colors[2]);
-		ImGui::Checkbox("fill2", &isActive[2]); ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_CheckMark, colors[3]);
-		ImGui::Checkbox("fill3", &isActive[3]);
-
-		int scaleNum = static_cast<int>(scale);
-		ImGui::Combo("scale", &scaleNum, "Chromatic\0Major\0Minor\0Pentatonic");
-		scale = static_cast<Scale>(scaleNum);
-		
-		int keyNum = static_cast<int>(key);
-		ImGui::Combo("key", &keyNum, "C\0Db\0D\0Eb\0E\0F\0Gb\0G\0Ab\0A\0Bb\0B");
-		key = static_cast<Key>(keyNum);
-		
-		ImGui::SliderInt("octave", &octave, -2, 8);
-		
-		ImGui::PopStyleColor(4);
-		
-	}
 	ImGui::PopStyleColor(2);
+	//if (ImGui::CollapsingHeader(name.data())) {
+
+	ImGui::NewLine();
+		
+	ImGui::PushID("active");
+	ImGui::Text("active:"); ImGui::SameLine();
+	for (int i = 0; i < 4; i++) {
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colors[i]);
+		ImGui::PushStyleColor(ImGuiCol_Header, colors[i]);
+		ImGui::Selectable(ofToString(i).data(), &isActive[i], 0, ImVec2(30, 30));
+		if (i != 3) ImGui::SameLine();
+	}
+	ImGui::PopID();
+	ImGui::PopStyleColor(4);
+
+	ImGui::NewLine();
+
+	int scaleNum = static_cast<int>(scale);
+	ImGui::Combo("scale", &scaleNum, "Chromatic\0Major\0Minor\0Pentatonic");
+	scale = static_cast<Scale>(scaleNum);
+		
+	int keyNum = static_cast<int>(key);
+	ImGui::Combo("key", &keyNum, "C\0Db\0D\0Eb\0E\0F\0Gb\0G\0Ab\0A\0Bb\0B");
+	key = static_cast<Key>(keyNum);
+		
+	ImGui::SliderInt("octave", &octave, -2, 8);
+		
+	//}
+	
 	ImGui::PopID();
 
 }
@@ -66,4 +71,8 @@ UCHAR ChannelInfo::translateMidi(int h) const {
 	int yp = ChannelInfo::scaleStep[si][h % ss];
 	
 	return yo + yp;
+}
+
+void ChannelInfo::setEditTarget(int& target) {
+	editTarget = target;
 }

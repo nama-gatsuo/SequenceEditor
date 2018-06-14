@@ -1,5 +1,6 @@
 #pragma once
 #include "ofMain.h"
+#include "Events.h"
 #include "ofxImGui.h"
 
 class ChannelInfo {
@@ -22,6 +23,7 @@ public:
 
 	UCHAR chIndex;
 	UCHAR chNumInDAW;
+	int editTarget;
 	string name;
 	
 	array<bool, 4> isActive;
@@ -30,4 +32,5 @@ public:
 
 	void drawGui();
 	UCHAR translateMidi(int midi) const;
+	void setEditTarget(int& target);
 };
