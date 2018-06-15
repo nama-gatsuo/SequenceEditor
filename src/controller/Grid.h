@@ -6,17 +6,18 @@ class Grid {
 public:
 	Grid() {}
 	Grid(int x, int y) : xSize(x), ySize(y) {
-		ids.assign(xSize, vector<int>(ySize, -1));
+		ids.assign(xSize, vector<array<int, 2>>(ySize, array<int, 2>{-1, -1}));
 	}
 
-	vector<int>& operator[](int x) {
+	vector<array<int, 2>>& operator[](int x) {
 		return ids[x];
 	}
 
 private:
 	int xSize;
 	int ySize;
-	vector<vector<int>> ids;
+	// x - y - { id, level }
+	vector<vector<array<int, 2>>> ids;
 };
 
 class GridUI {

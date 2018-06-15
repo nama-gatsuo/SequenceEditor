@@ -16,7 +16,7 @@ void UIState::onMouseMoved(const ivec2& index) {
 	switch (code) {
 	case Code::FREE:
 		if (isHoverOnGrid) {
-			noteId = grids->get()[current.x][current.y];
+			noteId = grids->get()[current.x][current.y][0];
 			if (noteId < 0) {
 				code = Code::HOVER_EMPTY;
 			} else {
@@ -26,7 +26,7 @@ void UIState::onMouseMoved(const ivec2& index) {
 		break;
 	case Code::HOVER_EMPTY:
 		if (isHoverOnGrid) {
-			noteId = grids->get()[current.x][current.y];
+			noteId = grids->get()[current.x][current.y][0];
 			if (noteId != -1) {
 				code = Code::HOVER_NOTE;
 			}
@@ -36,7 +36,7 @@ void UIState::onMouseMoved(const ivec2& index) {
 		break;
 	case Code::HOVER_NOTE:
 		if (isHoverOnGrid) {
-			noteId = grids->get()[current.x][current.y];
+			noteId = grids->get()[current.x][current.y][0];
 			if (noteId == -1) {
 				code = Code::HOVER_EMPTY;
 			}
@@ -62,7 +62,7 @@ void UIState::onMouseScrolled(float y) {
 
 		int id = score->update(noteId, n);
 		for (int i = 0; i < n.duration; i++) {
-			grids->get()[n.x + i][n.y] = id;
+			grids->get()[n.x + i][n.y][0] = id;
 		}
 		noteId = id;
 	}
@@ -123,7 +123,7 @@ void UIState::onMouseReleased() {
 
 			// check if there is any notes in new duration
 			for (int i = 0; i < dragLength; i++) {
-				int id = grids->get()[isDragBack ? start + i : start - i][y];
+				int id = grids->get()[isDragBack ? start + i : start - i][y][0];
 				if (id > -1) break;
 				else {
 					x = isDragBack ? start + i : start - i;
@@ -135,7 +135,7 @@ void UIState::onMouseReleased() {
 			NoteModel n(grids->getChan(), grids->getBar(), x, y, 100, d, currentEditLevel);
 			int id = score->create(n);
 			for (int i = 0; i < d; i++) {
-				grids->get()[x + i][y] = id;
+				grids->get()[x + i][y] = { id, currentEditLevel };
 			}
 
 			// reset
@@ -165,7 +165,7 @@ void UIState::onMouseReleased() {
 			// check if there is any notes in new duration
 			if (newDur > oldDur) {
 				for (int x = n.x + oldDur + 1; x < n.x + newDur; x++) {
-					int id = grids->get()[x][n.y];
+					int id = grids->get()[x][n.y][0];
 					if (id != -1) {
 						newDur = x - n.x;
 						break;
@@ -180,14 +180,14 @@ void UIState::onMouseReleased() {
 			// rewrite ids on the grid
 			if (newDur > oldDur) {
 				for (int x = n.x; x < n.x + newDur; x++) {
-					grids->get()[x][n.y] = noteId;
+					grids->get()[x][n.y][0] = noteId;
 				}
 			} else {
 				for (int d = 0; d < oldDur; d++) {
 					if (d < newDur) {
-						grids->get()[n.x + d][n.y] = noteId;
+						grids->get()[n.x + d][n.y][0] = noteId;
 					} else {
-						grids->get()[n.x + d][n.y] = -1;
+						grids->get()[n.x + d][n.y][0] = -1;
 					}
 					
 				}
@@ -203,7 +203,7 @@ void UIState::onMouseReleased() {
 			
 			NoteModel& n = score->get(noteId);
 			for (int x = n.x; x < n.x + n.duration; x++) {
-				grids->get()[x][n.y] = -1;
+				grids->get()[x][n.y] = { -1, -1 };
 			}
 			score->remove(noteId);
 			

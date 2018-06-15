@@ -28,7 +28,6 @@ void ChannelInfo::drawGui() {
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colorHeader);
 	ImGui::PushStyleColor(ImGuiCol_Header, colorHeader);
 	ImGui::PopStyleColor(2);
-	//if (ImGui::CollapsingHeader(name.data())) {
 
 	ImGui::NewLine();
 		
@@ -54,8 +53,6 @@ void ChannelInfo::drawGui() {
 	key = static_cast<Key>(keyNum);
 		
 	ImGui::SliderInt("octave", &octave, -2, 8);
-		
-	//}
 	
 	ImGui::PopID();
 

@@ -32,6 +32,8 @@ private:
 	void drawStateInfo() const;
 	bool isMouseFormer(int x) const;
 
+	void clear(int level);
+
 	ScoreManager * score;
 	Sequencer * sequencer;
 

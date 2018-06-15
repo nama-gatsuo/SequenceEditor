@@ -55,7 +55,7 @@ void UIManager::draw(int offsetX, int offsetY) {
 	ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImColor::ImColor(0.));
 	ImGui::PushStyleColor(ImGuiCol_TitleBg, ImColor::ImColor(0.));
 	
-	// channel info
+	// channel select
 	ImGui::Begin("ChannelSelect", &isDraw, window_flags);
 	int currentCh = grids.getChan();
 	ImGui::PushID("chselect");
@@ -107,6 +107,24 @@ void UIManager::draw(int offsetX, int offsetY) {
 		ImGui::PopStyleColor(2);
 	}
 	ImGui::PopID();
+
+	ImGui::PushID("clear");
+	ImGui::Text("clear :"); ImGui::SameLine();
+	for (int i = 0; i < 4; i++) {
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, score->getChannelInfo().colors[i]);
+		ImGui::PushStyleColor(ImGuiCol_Header, score->getChannelInfo().colors[i]);
+		bool b = false;
+		if (ImGui::Selectable(ofToString(i).data(), &b, 0, ImVec2(30, 30))) {
+			clear(i);
+		}
+
+		if (i != 3) ImGui::SameLine();
+		ImGui::PopStyleColor(2);
+	}
+	ImGui::PopID();
+
+
+
 	ImGui::End();
 	
 	ImGui::PopStyleColor(2);
@@ -337,3 +355,29 @@ bool UIManager::isMouseFormer(int x) const {
 	return (x / (int)(gridSize * 0.5)) % 2 == 0;
 }
 
+void UIManager::clear(int level) {
+	
+	auto& g = grids.get();
+	
+	for (int x = 0; x < BEAT; x++) {
+		for (int y = 0; y < PITCH; y++) {
+			int id = g[x][y][0];
+			int lev = g[x][y][1];
+
+			if (lev == level) {
+				g[x][y] = {-1, -1};
+				int d = score->get(id).duration;
+
+				for (int i = 0; i < d; i++) {
+					g[x+i][y] = { -1, -1 };
+				}
+
+				score->remove(id);
+
+			}
+
+		}
+	
+	}
+
+}
