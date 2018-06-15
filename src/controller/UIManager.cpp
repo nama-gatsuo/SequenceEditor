@@ -1,6 +1,6 @@
 #include "UIManager.h"
 
-UIManager::UIManager(int gridSize, int defaultVelocity) : gridSize(gridSize), defaultVelocity(defaultVelocity) {}
+UIManager::UIManager(int gridSize) : gridSize(gridSize) {}
 
 UIManager::~UIManager() {
 	ofRemoveListener(ofEvents().mouseMoved, this, &UIManager::mouseMoved);
@@ -92,6 +92,8 @@ void UIManager::draw(int offsetX, int offsetY) {
 	int bpm = sequencer->getBpm();
 	ImGui::SliderInt("BPM", &bpm, 80, 145);
 	if (bpm != sequencer->getBpm()) sequencer->setBpm(bpm);
+
+	ImGui::SliderInt("Velocity", &state.defaultVelocity, 1, 128);
 
 	ImGui::PushID("edit");
 	ImGui::Text("edit  :"); ImGui::SameLine();
@@ -237,7 +239,7 @@ void UIManager::drawStateInfo() const {
 		int duration = abs(state.pressed.x - state.current.x) + 1;
 		int x = state.pressed.x < state.current.x ? state.pressed.x : state.current.x;
 		int y = state.pressed.y;
-		int offset = (128.f - defaultVelocity) / 128.f * gridSize * 0.5;
+		int offset = (128.f - state.defaultVelocity) / 128.f * gridSize * 0.5;
 
 		auto& c = grids.getColor(0);
 		ofSetColor(c.r, c.g, c.b, 128);
@@ -380,4 +382,9 @@ void UIManager::clear(int level) {
 
 }
 
-void UIManager::randomize() {}
+void UIManager::randomize() {
+
+	
+
+
+}

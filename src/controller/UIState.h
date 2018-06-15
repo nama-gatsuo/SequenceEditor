@@ -16,6 +16,8 @@ public:
 	} code;
 
 	int currentEditLevel = 0;
+	int defaultVelocity = 100;
+
 	ivec2 current;
 	ivec2 pressed;
 	int noteId;
@@ -25,8 +27,6 @@ public:
 	void onMousePressed(bool isFormer);
 	void onMouseDragged(const ivec2& index);
 	void onMouseReleased();
-
-	void drawInfo();
 
 private:
 	GridUI * grids;

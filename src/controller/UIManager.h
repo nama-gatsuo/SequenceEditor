@@ -11,7 +11,7 @@ using namespace glm;
 
 class UIManager {
 public:
-	UIManager(int gridSize = 40, int defaultVelocity = 100);
+	UIManager(int gridSize = 40);
 	~UIManager();
 
 	void setup(ScoreManager& score, Sequencer& sequencer);
@@ -42,7 +42,6 @@ private:
 	int gridSize;
 	ivec2 startPos;
 	ivec2 size;
-	int defaultVelocity;
 
 	UIState state;
 	
