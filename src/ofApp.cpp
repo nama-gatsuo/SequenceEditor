@@ -4,6 +4,8 @@
 void ofApp::setup() {
 
 	ofSetFrameRate(60);
+	ofSetVerticalSync(true);
+	ofSetWindowTitle("sequencer");
 	ofBackground(0);
 
 	// 16 beats, 4 bars loop, 16 instruments (midi channels)

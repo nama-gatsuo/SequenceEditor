@@ -62,6 +62,7 @@ void UIManager::draw(int offsetX, int offsetY) {
 	gui.begin();
 	ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImColor::ImColor(0.));
 	ImGui::PushStyleColor(ImGuiCol_TitleBg, ImColor::ImColor(0.));
+	ImGui::PopStyleColor(2);
 
 	ImGui::Begin("Channels", &isDraw, window_flags);
 	score->getChannelInfo().drawGui();
@@ -76,8 +77,8 @@ void UIManager::draw(int offsetX, int offsetY) {
 	ImGui::SliderInt("BPM", &bpm, 80, 145);
 	if (bpm != sequencer->getBpm()) sequencer->setBpm(bpm);
 
-	ImGui::PushID("active");
-
+	ImGui::PushID("edit");
+	ImGui::Text("edit  :"); ImGui::SameLine();
 	for (int i = 0; i < 4; i++) {
 		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, score->getChannelInfo().colors[i]);
 		ImGui::PushStyleColor(ImGuiCol_Header, score->getChannelInfo().colors[i]);
@@ -85,13 +86,14 @@ void UIManager::draw(int offsetX, int offsetY) {
 		if (ImGui::Selectable(ofToString(i).data(), &b, 0, ImVec2(30, 30))) {
 			state.currentEditLevel = i;
 		}
+		
 		if (i != 3) ImGui::SameLine();
+		ImGui::PopStyleColor(2);
 	}
 	ImGui::PopID();
 
 	ImGui::End();
-
-	ImGui::PopStyleColor(2);
+	
 	gui.end();
 
 }
@@ -173,7 +175,7 @@ void UIManager::drawGrid() const {
 
 		ofSetColor(grids.getColor(level));
 
-		if (ci.isActive[level]) ofFill();
+		if (isActive) ofFill();
 		else ofNoFill();
 
 		ofDrawRectangle(

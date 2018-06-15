@@ -39,9 +39,9 @@ void ChannelInfo::drawGui() {
 		ImGui::PushStyleColor(ImGuiCol_Header, colors[i]);
 		ImGui::Selectable(ofToString(i).data(), &isActive[i], 0, ImVec2(30, 30));
 		if (i != 3) ImGui::SameLine();
+		ImGui::PopStyleColor(2);
 	}
 	ImGui::PopID();
-	ImGui::PopStyleColor(4);
 
 	ImGui::NewLine();
 

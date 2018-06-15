@@ -12,8 +12,9 @@ public:
 	void update();
 	void draw();
 
-private:
 	ScoreManager score;
+
+private:
 	Sequencer sequencer;
 	UIManager ui;
 };

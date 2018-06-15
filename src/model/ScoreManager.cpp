@@ -133,6 +133,14 @@ void ScoreManager::remove(int id) {
 	notes[b][c].erase(id);
 }
 
+void ScoreManager::clearCurrent(UCHAR level) {
+	UCHAR c = currentChan;
+	UCHAR b = currentBar;
+
+	
+
+}
+
 std::pair<UCHAR, UCHAR> ScoreManager::calcEnd(UCHAR startBeat, UCHAR startBar, UCHAR duration) const {
 
 	UCHAR endBeat = startBeat + duration;

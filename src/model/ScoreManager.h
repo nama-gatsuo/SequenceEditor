@@ -22,6 +22,7 @@ public:
 	std::unordered_map<int, NoteModel>& get();
 	int update(int id, const NoteModel& note);
 	void remove(int id);
+	void clearCurrent(UCHAR level);
 
 	ChannelInfo& getChannelInfo() { return chanInfos[currentChan]; }
 	ChannelInfo& getChannelInfo(UCHAR index) { return chanInfos[index]; }
@@ -37,6 +38,10 @@ public:
 	static UCHAR barCount;
 	static UCHAR channelCount;
 	static UCHAR pitchCount;
+
+	// for visual IF: get note
+	vector<vector<BarModel>>& getMidis() { return midis; }
+	vector<vector<std::unordered_map<int, NoteModel>>>& getNotes() { return notes; }
 
 private:
 	std::pair<UCHAR, UCHAR> calcEnd(UCHAR startBeat, UCHAR startBar, UCHAR duration) const;
