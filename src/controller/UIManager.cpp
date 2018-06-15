@@ -39,7 +39,7 @@ void UIManager::setup(ScoreManager& score, Sequencer& sequencer) {
 void UIManager::draw(int offsetX, int offsetY) {
 	
 	// text info
-	ofSetColor(grids.getColor(3) * 0.3);
+	ofSetColor(grids.getColor(2) * 0.3);
 	font.drawString(ofToString((int)grids.getBar()), startPos.x + 60, startPos.y);
 	ofSetColor(255);
 	ofDrawBitmapString("fps: " + ofToString(ofGetFrameRate()), 15, 15);
@@ -122,8 +122,6 @@ void UIManager::draw(int offsetX, int offsetY) {
 		ImGui::PopStyleColor(2);
 	}
 	ImGui::PopID();
-
-
 
 	ImGui::End();
 	
@@ -381,3 +379,5 @@ void UIManager::clear(int level) {
 	}
 
 }
+
+void UIManager::randomize() {}

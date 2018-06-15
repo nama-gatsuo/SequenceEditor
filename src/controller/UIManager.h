@@ -33,6 +33,8 @@ private:
 	bool isMouseFormer(int x) const;
 
 	void clear(int level);
+	void randomize();
+
 
 	ScoreManager * score;
 	Sequencer * sequencer;

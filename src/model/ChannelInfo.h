@@ -23,7 +23,6 @@ public:
 
 	UCHAR chIndex;
 	UCHAR chNumInDAW;
-	int editTarget;
 	string name;
 	
 	array<bool, 4> isActive;

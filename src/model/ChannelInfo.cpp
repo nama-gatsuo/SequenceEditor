@@ -11,7 +11,7 @@ ChannelInfo::ChannelInfo(int i, const string& name) : chIndex(i) {
 	float hue = ((1. / 3.) * (i % 3) + (i / 3) * 0.03) * 0.5 + 0.4;
 	colorHeader = ImColor::HSV(hue, 0.4, 0.4);
 	for (int i = 0; i < colors.size(); i++) {
-		colors[i] = ImColor::HSV(hue, 1. - 0.25 * i, 0.4 + 0.1 * i);
+		colors[i] = ImColor::HSV(hue, 1. - 0.25 * i, 0.4 + 0.08 * i);
 	}
 
 	isActive[0] = true;
@@ -19,7 +19,6 @@ ChannelInfo::ChannelInfo(int i, const string& name) : chIndex(i) {
 	isActive[2] = false;
 	isActive[3] = false;
 
-	ofAddListener(EventsEntity::editTarget, this, &ChannelInfo::setEditTarget);
 }
 
 void ChannelInfo::drawGui() {
@@ -68,8 +67,4 @@ UCHAR ChannelInfo::translateMidi(int h) const {
 	int yp = ChannelInfo::scaleStep[si][h % ss];
 	
 	return yo + yp;
-}
-
-void ChannelInfo::setEditTarget(int& target) {
-	editTarget = target;
 }

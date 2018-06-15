@@ -38,24 +38,22 @@ public:
 	void setChan(UCHAR ch) {
 		this->ch = ch;
 
-		float hue = 256 * (((1. / 3.) * (ch % 3) + (ch / 3) * 0.03) * 0.5 + 0.4);
+		float hue = ((1. / 3.) * (ch % 3) + (ch / 3) * 0.03) * 0.5 + 0.4;
 		for (int i = 0; i < color.size(); i++) {
-			color[i].setHsb(hue, 256 * (1. - 0.25 * i), 256 * 0.8);
+			color[i].setHsb(hue, 1. - 0.25 * i, 0.4 + 0.08 * i);
 		}
 
-		ofColor c;
-		c.setHsb(hue, 255 * 0.4, 255 * 0.2);
-		ofBackground(c);
+		ofBackground(color[2] * 0.2);
 	}
 
 	UCHAR getBar() const { return bar; }
 	UCHAR getChan() const { return ch; }
-	const ofColor& getColor(int i) const { return color[i]; }
+	const ofFloatColor& getColor(int i) const { return color[i]; }
 
 private:
 	UCHAR bar;
 	UCHAR ch;
-	std::array<ofColor, 4> color;
+	std::array<ofFloatColor, 4> color;
 
 	// bar - ch - x(beat) - y(pitch)
 	vector<vector<Grid>> data;
