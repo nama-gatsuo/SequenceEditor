@@ -31,43 +31,59 @@ void UIManager::setup(ScoreManager& score, Sequencer& sequencer) {
 
 	state.setup(grids, score);
 	gui.setup();
+
+	font.load("font/Track.ttf", 600, true);
+	font.setLetterSpacing(1.037);
 }
 
 void UIManager::draw(int offsetX, int offsetY) {
 	
 	// text info
-	int w = 160;
-	int h = 0;
-	int lh = 16; // line height
-
+	ofSetColor(grids.getColor(3) * 0.3);
+	font.drawString(ofToString((int)grids.getBar()), startPos.x + 60, startPos.y);
 	ofSetColor(255);
-	ofSetLineWidth(0.1);
-
-	ofDrawBitmapString("bpm: " + ofToString(sequencer->getBpm()), offsetX, offsetY + lh * (++h));
-	h++;
-	ofDrawBitmapString("fps: " + ofToString(ofGetFrameRate()), offsetX, offsetY + lh * (++h));
-
-	h = 0;
-	ofDrawBitmapString("channel: " + score->getChannelInfo().name, offsetX + w, offsetY + lh * (++h));
-	ofDrawBitmapString("bar: " + ofToString(grids.getBar()), offsetX + w, offsetY + lh * (++h));
-	ofDrawBitmapString("state: " + ofToString((int)state.code), offsetX + w, offsetY + lh * (++h));
+	ofDrawBitmapString("fps: " + ofToString(ofGetFrameRate()), 15, 15);
 
 	// grid
 	drawGrid();
 	
-	// channel info gui
+	// ImGui
 	bool isDraw = true;
 	ImGuiWindowFlags window_flags = 0;
 
 	gui.begin();
 	ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImColor::ImColor(0.));
 	ImGui::PushStyleColor(ImGuiCol_TitleBg, ImColor::ImColor(0.));
-	ImGui::PopStyleColor(2);
+	
+	// channel info
+	ImGui::Begin("ChannelSelect", &isDraw, window_flags);
+	int currentCh = grids.getChan();
+	ImGui::PushID("chselect");
+	for (int i = 0; i < 16; i++) {
+		auto& col1 = score->getChannelInfo(i).colors[0];
+		auto& col2 = score->getChannelInfo(i).colors[1];
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, col1);
+		ImGui::PushStyleColor(ImGuiCol_Header, col2);
+		
+		bool b = currentCh == i;
+		if (ImGui::Selectable(ofToString(i).data(), &b, 0, ImVec2(30, 30))) {
+			grids.setChan(i);
+			score->setChan(i);
+		}
 
+		if (i % 8 != 7) ImGui::SameLine();
+		ImGui::PopStyleColor(2);
+	}
+	ImGui::PopID();
+	ImGui::End();
+	
+	
+	// channel info
 	ImGui::Begin("Channels", &isDraw, window_flags);
 	score->getChannelInfo().drawGui();
 	ImGui::End();
 
+	// global info
 	ImGui::Begin("Global", &isDraw, window_flags);
 	int bar = BAR;
 	ImGui::SliderInt("Loop", &bar, 1, 4);
@@ -91,9 +107,9 @@ void UIManager::draw(int offsetX, int offsetY) {
 		ImGui::PopStyleColor(2);
 	}
 	ImGui::PopID();
-
 	ImGui::End();
 	
+	ImGui::PopStyleColor(2);
 	gui.end();
 
 }

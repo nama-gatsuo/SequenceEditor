@@ -193,8 +193,6 @@ void UIState::onMouseReleased() {
 				}
 			}
 
-			
-
 			code = Code::HOVER_NOTE;
 			pressed = ivec2(-1);
 

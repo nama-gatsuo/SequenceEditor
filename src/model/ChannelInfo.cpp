@@ -11,7 +11,7 @@ ChannelInfo::ChannelInfo(int i, const string& name) : chIndex(i) {
 	float hue = ((1. / 3.) * (i % 3) + (i / 3) * 0.03) * 0.5 + 0.4;
 	colorHeader = ImColor::HSV(hue, 0.4, 0.4);
 	for (int i = 0; i < colors.size(); i++) {
-		colors[i] = ImColor::HSV(hue, 1. - 0.25 * i, 0.8);
+		colors[i] = ImColor::HSV(hue, 1. - 0.25 * i, 0.4 + 0.1 * i);
 	}
 
 	isActive[0] = true;
