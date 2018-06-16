@@ -22,7 +22,7 @@ public:
 	std::unordered_map<int, NoteModel>& get();
 	int update(int id, const NoteModel& note);
 	void remove(int id);
-	void clearCurrent(UCHAR level);
+	//void clearCurrent(UCHAR level);
 
 	ChannelInfo& getChannelInfo() { return chanInfos[currentChan]; }
 	ChannelInfo& getChannelInfo(UCHAR index) { return chanInfos[index]; }

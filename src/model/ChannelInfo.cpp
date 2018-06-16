@@ -4,11 +4,10 @@ std::vector<vector<int>> ChannelInfo::scaleStep;
 
 ChannelInfo::ChannelInfo() {}
 
-ChannelInfo::ChannelInfo(int i, const string& name) : chIndex(i) {
+ChannelInfo::ChannelInfo(int i, const string& name, float hue) : chIndex(i), hue(hue) {
 	chNumInDAW = chIndex + 1;
 	this->name = "ch[" + ofToString(i) + "]: " + name;
 	
-	float hue = ((1. / 3.) * (i % 3) + (i / 3) * 0.03) * 0.5 + 0.4;
 	colorHeader = ImColor::HSV(hue, 0.4, 0.4);
 	for (int i = 0; i < colors.size(); i++) {
 		colors[i] = ImColor::HSV(hue, 1. - 0.25 * i, 0.4 + 0.08 * i);
@@ -27,6 +26,8 @@ void ChannelInfo::drawGui() {
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colorHeader);
 	ImGui::PushStyleColor(ImGuiCol_Header, colorHeader);
 	ImGui::PopStyleColor(2);
+
+	ImGui::Text(name.data());
 
 	ImGui::NewLine();
 		
@@ -53,6 +54,23 @@ void ChannelInfo::drawGui() {
 		
 	ImGui::SliderInt("octave", &octave, -2, 8);
 	
+	ImGui::NewLine();
+
+	ImGui::Text("Random");
+	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colors[0]);
+	ImGui::PushStyleColor(ImGuiCol_Header, colors[1]);
+	ImGui::Selectable("Loop", &isRandomLoop, 0, ImVec2(60, 30));
+	bool b = false;
+	if (ImGui::Selectable("Exec", &b, 0, ImVec2(60, 30))) {
+		ExecRandom e(0, chIndex);
+		ofNotifyEvent(EventsEntity::execRandom, e);
+	}
+
+	ImGui::PopStyleColor(2);
+	ImGui::SliderInt("chord", &randomChordNum, 1, 8);
+	ImGui::SliderFloat("notesNum", &randomNotesNum, 0, 1);
+	ImGui::SliderInt("velocityRange", &velocityRange, 0, 60);
+
 	ImGui::PopID();
 
 }

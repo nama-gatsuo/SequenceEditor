@@ -35,10 +35,9 @@ public:
 		this->bar = bar;
 	}
 
-	void setChan(UCHAR ch) {
+	void setChan(UCHAR ch, float hue) {
 		this->ch = ch;
-
-		float hue = ((1. / 3.) * (ch % 3) + (ch / 3) * 0.03) * 0.5 + 0.4;
+		
 		for (int i = 0; i < color.size(); i++) {
 			color[i].setHsb(hue, 1. - 0.25 * i, 0.4 + 0.08 * i);
 		}

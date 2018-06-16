@@ -6,7 +6,7 @@
 class ChannelInfo {
 public:
 	ChannelInfo();
-	ChannelInfo(int i, const string& name);
+	ChannelInfo(int i, const string& name, float hue);
 
 	enum Scale {
 		CHROMATIC = 0, MAJOR, MINOR, PENTATONIC
@@ -24,12 +24,19 @@ public:
 	UCHAR chIndex;
 	UCHAR chNumInDAW;
 	string name;
-	
+	float hue;
+
 	array<bool, 4> isActive;
 	array<ImColor, 4> colors;
 	ImColor colorHeader;
 
 	void drawGui();
 	UCHAR translateMidi(int midi) const;
-	void setEditTarget(int& target);
+	
+	// random seeds
+	bool isRandomLoop = false;
+	int randomChordNum = 1;
+	float randomNotesNum = 0.1;
+	int velocityRange = 10;
+
 };

@@ -12,7 +12,7 @@ void ofApp::setup() {
 	score.setup(16, 4, 16);
 	
 	// bpm = 120
-	sequencer.init(score, 120);
+	sequencer.init(score, 100);
 	
 	ui.setup(score, sequencer);
 	ui.setPosition(64, ofGetHeight() - 64);

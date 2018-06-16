@@ -16,7 +16,7 @@ public:
 	} code;
 
 	int currentEditLevel = 0;
-	int defaultVelocity = 100;
+	int defaultVelocity = 64;
 
 	ivec2 current;
 	ivec2 pressed;

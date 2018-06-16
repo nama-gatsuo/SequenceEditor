@@ -21,7 +21,9 @@ void ScoreManager::setup(UCHAR beat, UCHAR barCount, UCHAR pitchCount) {
 		int i = 0;
 		for (auto& data : json) {
 			string name = data["name"];
-			ChannelInfo ch(i, name);
+			float hue = ofToFloat(data["hue"]);
+
+			ChannelInfo ch(i, name, hue);
 
 			ch.octave = data["octave"];
 			ch.key = static_cast<ChannelInfo::Key>(data["key"]);
@@ -133,13 +135,13 @@ void ScoreManager::remove(int id) {
 	notes[b][c].erase(id);
 }
 
-void ScoreManager::clearCurrent(UCHAR level) {
-	UCHAR c = currentChan;
-	UCHAR b = currentBar;
-
-	
-
-}
+//void ScoreManager::clearCurrent(UCHAR level) {
+//	UCHAR c = currentChan;
+//	UCHAR b = currentBar;
+//
+//	
+//
+//}
 
 std::pair<UCHAR, UCHAR> ScoreManager::calcEnd(UCHAR startBeat, UCHAR startBar, UCHAR duration) const {
 

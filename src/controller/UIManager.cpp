@@ -9,6 +9,8 @@ UIManager::~UIManager() {
 	ofRemoveListener(ofEvents().mouseReleased, this, &UIManager::mouseReleased);
 	ofRemoveListener(ofEvents().keyPressed, this, &UIManager::keyPressed);
 	ofRemoveListener(ofEvents().mouseScrolled, this, &UIManager::mouseScrolled);
+
+	ofRemoveListener(EventsEntity::execRandom, this, &UIManager::randomize);
 }
 
 void UIManager::setup(ScoreManager& score, Sequencer& sequencer) {
@@ -24,9 +26,11 @@ void UIManager::setup(ScoreManager& score, Sequencer& sequencer) {
 	ofAddListener(ofEvents().keyPressed, this, &UIManager::keyPressed);
 	ofAddListener(ofEvents().mouseScrolled, this, &UIManager::mouseScrolled);
 
+	ofAddListener(EventsEntity::execRandom, this, &UIManager::randomize);
+
 	grids = GridUI(CHANNEL, BAR, PITCH, BEAT);
 	grids.setBar(0);
-	grids.setChan(0);
+	grids.setChan(0, this->score->getChannelInfo(0).hue);
 	this->score->setCurrent(0, 0);
 
 	state.setup(grids, score);
@@ -67,7 +71,7 @@ void UIManager::draw(int offsetX, int offsetY) {
 		
 		bool b = currentCh == i;
 		if (ImGui::Selectable(ofToString(i).data(), &b, 0, ImVec2(30, 30))) {
-			grids.setChan(i);
+			grids.setChan(i, score->getChannelInfo(i).hue);
 			score->setChan(i);
 		}
 
@@ -167,6 +171,14 @@ void UIManager::drawGrid() const {
 	for (int y = 0; y <= size.y; y += gridSize) {
 		ofDrawLine(0, y, size.x, y);
 	}
+	ofSetColor(255);
+	for (int x = 0; x <= size.x; x += gridSize * 4) {
+		ofDrawLine(x, 0, x, size.y);
+	}
+	for (int y = 0; y <= size.y; y += gridSize * 4) {
+		ofDrawLine(0, y, size.x, y);
+	}
+
 	
 	// rhythm guide
 	UCHAR cbeat = sequencer->getCurrentBeat();
@@ -267,7 +279,7 @@ void UIManager::drawStateInfo() const {
 		ofDrawLine(x1, y1, x2, y2);
 
 		ofDrawBitmapString("velocity: " + ofToString((int)n.velocity), x2 + 2, y2);
-		//ofDrawBitmapString("id: " + ofToString(state.noteId), x2, y1);
+		ofDrawBitmapString("id: " + ofToString(state.noteId), x2, y1);
 	} break;
 	case UIState::Code::DRAG_EDIT:
 		
@@ -317,7 +329,7 @@ void UIManager::keyPressed(ofKeyEventArgs& args) {
 		if (ch >= CHANNEL) ch -= CHANNEL;
 		else if (ch < 0) ch += CHANNEL;
 
-		grids.setChan(ch);
+		grids.setChan(ch, score->getChannelInfo(ch).hue);
 		score->setChan(ch);
 	} break;
 	case OF_KEY_DOWN: {
@@ -325,7 +337,7 @@ void UIManager::keyPressed(ofKeyEventArgs& args) {
 		if (ch >= CHANNEL) ch -= CHANNEL;
 		else if (ch < 0) ch += CHANNEL;
 
-		grids.setChan(ch);
+		grids.setChan(ch, score->getChannelInfo(ch).hue);
 		score->setChan(ch);
 	} break;
 	case OF_KEY_RIGHT: {
@@ -382,9 +394,43 @@ void UIManager::clear(int level) {
 
 }
 
-void UIManager::randomize() {
+void UIManager::randomize(ExecRandom& e) {
+
+	clear(3);
+	int minDuration = 1;
+	float randomNotesNum = score->getChannelInfo(e.ch).randomNotesNum;
+	int randomChordNum = score->getChannelInfo(e.ch).randomChordNum;
 
 	
+
+	int currentX = 0;
+	for (int i = 0; i < BEAT; i++) {
+		
+		if (ofRandom(1.) < randomNotesNum) {
+			ofLogNotice() << "exec";
+			int currentY = ofRandom(0, 8);
+			for (int j = 0; j < randomChordNum; j++) {
+				
+				if (grids.get()[i][currentY][0] == -1) {
+
+					NoteModel n(grids.getChan(), grids.getBar(), i, currentY, state.defaultVelocity, 1, 3);
+					int id = score->create(n);
+
+					grids.get()[i][currentY] = { id, 3 };
+
+				}
+				currentY += (int)ofRandom(0, 4);
+				if (currentY > 15) currentY = 15;
+
+			}
+			
+		}
+
+		
+
+
+
+	}
 
 
 }
