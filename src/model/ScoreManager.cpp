@@ -102,6 +102,17 @@ int ScoreManager::create(const NoteModel& note) {
 	notes[b][c][id].midiId[0] = note.y + pitchCount;
 	notes[b][c][id].midiId[1] = note.y;
 
+	/*
+	cout << "-- create --" << endl;
+	cout << "bar:" + ofToString((int)b) << endl;
+	cout << "ch:" + ofToString((int)c) << endl;
+	cout << "x:" + ofToString((int)note.x) << endl;
+	cout << "y:" + ofToString((int)note.y) << endl;
+	cout << "duration:" + ofToString((int)note.duration) << endl;
+	cout << "id:" + ofToString(id) << endl;
+	cout << "level:" + ofToString((int)note.level) << endl;
+	*/
+
 	return id;
 }
 

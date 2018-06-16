@@ -1,8 +1,12 @@
 #pragma once
 #include "ofMain.h"
 #include "ScoreManager.h"
+#include "VisBoxes.h"
+#include "ofxDeferredShading.h"
+#include "ofxDeferredParams.h"
 
 using namespace glm;
+using namespace ofxDeferred;
 
 class VisualApp : public ofBaseApp {
 public:
@@ -11,29 +15,48 @@ public:
 		ofSetVerticalSync(true);
 		ofSetWindowTitle("visual");
 		ofEnableDepthTest();
+		//ofToggleFullscreen();
+
+		vb.setup();
+		
+		deferred.init(1920, 1080);
+		params.setup(deferred);
+		
+
 	};
+
 	void update() {
-		//cam.setPosition(500 * cos(ofGetElapsedTimef()), 0, sin(ofGetElapsedTimef()));
-		//cam.lookAt(vec3(0, 0, 0));
+		cam.setPosition(500 * cos(ofGetElapsedTimef()), 0, 500 * sin(ofGetElapsedTimef()));
+		cam.lookAt(vec3(0, 0, 0));
+
+		vb.update(*score, *sequencer);
+
 	};
 	void draw() {
-		
-		cam.begin();
 
-		auto& m = score->getNotes();
-		
-		int barNum = 0;
-		
-		
-		cam.end();
-		 
-		//ofDrawCircle(vec2(ofGetWidth() * (0.5 + sin(ofGetElapsedTimef()) * 0.5), 540), 100);
+		params.getShadow()->beginShadowMap(true);
+		vb.draw(params.getShadow()->getCamera(), true);
+		params.getPointLight()->drawLights(params.getShadow()->getCamera(), true);
+		params.getShadow()->endShadowMap();
+
+		deferred.begin(cam);
+		vb.draw(cam, false);
+		params.getPointLight()->drawLights(cam, false);
+		deferred.end();
+
+		params.drawGui();
 		ofDrawBitmapString("fps: " + ofToString(ofGetFrameRate()), 20, 20);
 	};
 
-	ofEasyCam cam;
-
 	ScoreManager* score;
-	//UIManager* ui;
+	Sequencer* sequencer;
 
+private:
+	//UIManager* ui;
+	ofEasyCam cam;
+	VisBox vb;
+
+	ofxDeferredProcessing deferred;
+	
+	ofxDeferredParams params;
 };

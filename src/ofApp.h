@@ -13,8 +13,6 @@ public:
 	void draw();
 
 	ScoreManager score;
-
-private:
 	Sequencer sequencer;
 	UIManager ui;
 };

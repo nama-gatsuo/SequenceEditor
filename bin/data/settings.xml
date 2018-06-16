@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<PointLightPass>
+	<enable>1</enable>
+	<point_light_1>
+		<diffuse_color>0.4, 0.4, 0.4, 1</diffuse_color>
+		<ambient_color>0, 0, 0, 1</ambient_color>
+		<specular_color>1, 1, 1, 1</specular_color>
+		<positin>500, 500, 271.137</positin>
+		<radius>540.816</radius>
+		<intensity>1.35204</intensity>
+	</point_light_1>
+</PointLightPass>

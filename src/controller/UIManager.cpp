@@ -210,9 +210,12 @@ void UIManager::drawGrid() const {
 	auto& pairs = score->get();
 	ofPushStyle();
 	for (auto& pair : pairs) {
-		int y = pair.second.y;
-		int x = pair.second.x;
+		UCHAR y = pair.second.y;
+		UCHAR x = pair.second.x;
 		UCHAR level = pair.second.level;
+
+		if (y > 15 || x > 15 || level > 3) continue;
+
 		ChannelInfo ci = score->getChannelInfo();
 		bool isActive = ci.isActive[level];
 
@@ -225,7 +228,7 @@ void UIManager::drawGrid() const {
 		else ofNoFill();
 
 		ofDrawRectangle(
-			offset + x * gridSize, offset + y * gridSize,
+			offset + (int)x * gridSize, offset + (int)y * gridSize,
 			gridSize * duration - offset * 2, gridSize - offset * 2);
 		
 
@@ -371,16 +374,18 @@ void UIManager::clear(int level) {
 	
 	auto& g = grids.get();
 	
-	for (int x = 0; x < BEAT; x++) {
-		for (int y = 0; y < PITCH; y++) {
-			int id = g[x][y][0];
-			int lev = g[x][y][1];
+	for (UCHAR x = 0; x < BEAT; x++) {
+		for (UCHAR y = 0; y < PITCH; y++) {
+			UCHAR id = g[x][y][0];
+			UCHAR lev = g[x][y][1];
 
 			if (lev == level) {
 				g[x][y] = {-1, -1};
-				int d = score->get(id).duration;
+				UCHAR d = score->get(id).duration;
 
-				for (int i = 0; i < d; i++) {
+				if (d > 15 || y > 15 || x > 15) continue;
+
+				for (UCHAR i = 0; i < d; i++) {
 					g[x+i][y] = { -1, -1 };
 				}
 

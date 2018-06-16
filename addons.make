@@ -1,2 +1,5 @@
+ofxDeferredParams
+ofxDeferredShading
+ofxGui
 ofxImGui
 ofxMidi
