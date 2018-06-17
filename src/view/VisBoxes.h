@@ -24,9 +24,6 @@ public:
 		ofPixels& colPix = colData.getPixelsRef();
 		ofPixels& posPix = posData.getPixelsRef();
 		ofPixels& unitPix = unitData.getPixelsRef();
-
-		
-
 		
 		// bar block
 		int barCount = 0;
@@ -42,7 +39,7 @@ public:
 
 				for (auto& n : ch) {
 
-					UCHAR x = n.second.x + barCount * 16;
+					UCHAR x = n.second.x;
 					UCHAR y = n.second.y;
 					UCHAR l = n.second.level;
 					
@@ -50,7 +47,7 @@ public:
 
 					auto& c = chInfo.colors[l];
 					colPix.setColor(num, 0, ofFloatColor(c.Value.x, c.Value.y, c.Value.z));
-					posPix.setColor(num, 0, ofFloatColor(chIndex/64., y/64., x/64.));
+					posPix.setColor(num, 0, ofFloatColor(chIndex/64., y/64., (x + barCount * 16) /64.));
 					
 					UCHAR ac = chInfo.isActive[l] ? 1 : 0;
 					UCHAR v = n.second.velocity;

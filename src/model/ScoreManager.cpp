@@ -102,6 +102,7 @@ void ScoreManager::setCurrent(UCHAR bar, UCHAR ch) {
 
 int ScoreManager::create(const NoteModel& note) {
 
+	if (note.x > 15 || note.y > 15) return -1;
 	UCHAR c = note.ch;
 	UCHAR b = note.barNum;
 

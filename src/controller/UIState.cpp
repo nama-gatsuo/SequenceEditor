@@ -157,6 +157,7 @@ void UIState::onMouseReleased() {
 			// copy from reference
 			// because original data will be deleted in score->update()
 			NoteModel n = score->get(noteId);
+			if (n.x > 15 || n.y > 15) break;
 			int oldDur = n.duration;
 
 			int newDur = current.x - n.x + 1;

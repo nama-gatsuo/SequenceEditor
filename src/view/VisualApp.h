@@ -11,11 +11,11 @@ using namespace ofxDeferred;
 class VisualApp : public ofBaseApp {
 public:
 	void setup() {
-		ofSetFrameRate(60);
+		ofSetFrameRate(30);
 		ofSetVerticalSync(true);
 		ofSetWindowTitle("visual");
 		ofEnableDepthTest();
-		//ofToggleFullscreen();
+		ofToggleFullscreen();
 
 		vb.setup();
 		
@@ -26,7 +26,7 @@ public:
 	};
 
 	void update() {
-		cam.setPosition(500 * cos(ofGetElapsedTimef()), 0, 500 * sin(ofGetElapsedTimef()));
+		cam.setPosition(800 * cos(ofGetElapsedTimef() * 0.2), 100 * cos(ofGetElapsedTimef() * 0.1), 3200 * sin(ofGetElapsedTimef() * 0.2));
 		cam.lookAt(vec3(0, 0, 0));
 
 		vb.update(*score, *sequencer);

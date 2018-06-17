@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 
-	ofSetFrameRate(60);
+	ofSetFrameRate(30);
 	ofSetVerticalSync(true);
 	ofSetWindowTitle("sequencer");
 	ofBackground(0);

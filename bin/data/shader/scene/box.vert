@@ -35,7 +35,7 @@ void main(){
     float zs = u.z * 16. - (1. - s);
     vec3 ss = vec3(s, s, zs);
 
-    vec3 pos = (p * 64. + vec3(0, 0, zt)) * size;
+    vec3 pos = (p * 64. - vec3(8,8,32) + vec3(0, 0, zt)) * size;
     pos = pos + ss * position.xyz;
 
     vUv = texcoord;

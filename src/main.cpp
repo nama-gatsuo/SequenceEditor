@@ -19,10 +19,12 @@ int main( ){
 
 	// visual
 	s.setSize(1920, 1080);
-	s.setPosition(glm::vec2(1921, 0));
+	s.setPosition(glm::vec2(0, 0));
 	s.resizable = true;
 	s.shareContextWith = main;
+	s.multiMonitorFullScreen = true;
 	shared_ptr<ofAppBaseWindow> visual = ofCreateWindow(s);
+	
 	shared_ptr<VisualApp> visApp(new VisualApp);
 	visApp->score = &mainApp->score;
 	visApp->sequencer = &mainApp->sequencer;
