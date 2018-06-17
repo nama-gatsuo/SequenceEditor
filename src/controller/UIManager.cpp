@@ -121,7 +121,7 @@ void UIManager::draw(int offsetX, int offsetY) {
 		ImGui::PushStyleColor(ImGuiCol_Header, score->getChannelInfo().colors[i]);
 		bool b = false;
 		if (ImGui::Selectable(ofToString(i).data(), &b, 0, ImVec2(30, 30))) {
-			clear(i);
+			clear(grids.getBar(), grids.getChan(), i);
 		}
 
 		if (i != 3) ImGui::SameLine();
@@ -370,9 +370,9 @@ bool UIManager::isMouseFormer(int x) const {
 	return (x / (int)(gridSize * 0.5)) % 2 == 0;
 }
 
-void UIManager::clear(int level) {
+void UIManager::clear(UCHAR bar, UCHAR ch, UCHAR level) {
 	
-	auto& g = grids.get();
+	auto& g = grids.get(bar, ch);
 	
 	for (UCHAR x = 0; x < BEAT; x++) {
 		for (UCHAR y = 0; y < PITCH; y++) {
@@ -380,8 +380,8 @@ void UIManager::clear(int level) {
 			UCHAR lev = g[x][y][1];
 
 			if (lev == level) {
-				g[x][y] = {-1, -1};
-				UCHAR d = score->get(id).duration;
+				g[x][y] = { -1, -1 };
+				UCHAR d = score->get(bar, ch)[id].duration;
 
 				if (d > 15 || y > 15 || x > 15) continue;
 
@@ -389,7 +389,7 @@ void UIManager::clear(int level) {
 					g[x+i][y] = { -1, -1 };
 				}
 
-				score->remove(id);
+				score->remove(bar, ch, id);
 
 			}
 
@@ -401,27 +401,31 @@ void UIManager::clear(int level) {
 
 void UIManager::randomize(ExecRandom& e) {
 
-	clear(3);
-	int minDuration = 1;
 	float randomNotesNum = score->getChannelInfo(e.ch).randomNotesNum;
 	int randomChordNum = score->getChannelInfo(e.ch).randomChordNum;
+	int velRange = score->getChannelInfo(e.ch).velocityRange;
 
+	UCHAR b = e.bar > 3 ? grids.getBar() : e.bar;
 	
-
+	clear(b, e.ch, 3);
+	
 	int currentX = 0;
 	for (int i = 0; i < BEAT; i++) {
 		
 		if (ofRandom(1.) < randomNotesNum) {
-			ofLogNotice() << "exec";
+			
 			int currentY = ofRandom(0, 8);
 			for (int j = 0; j < randomChordNum; j++) {
 				
-				if (grids.get()[i][currentY][0] == -1) {
+				if (grids.get(b, e.ch)[i][currentY][0] == -1) {
 
-					NoteModel n(grids.getChan(), grids.getBar(), i, currentY, state.defaultVelocity, 1, 3);
+					int vel = ofClamp(state.defaultVelocity + velRange * ofRandom(-1, 1), 0, 128);
+
+					NoteModel n(e.ch, b, i, currentY, vel, 1, 3);
+					
 					int id = score->create(n);
 
-					grids.get()[i][currentY] = { id, 3 };
+					grids.get(b, e.ch)[i][currentY] = { id, 3 };
 
 				}
 				currentY += (int)ofRandom(0, 4);

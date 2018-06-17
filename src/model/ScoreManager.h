@@ -17,11 +17,14 @@ public:
 	void setBar(UCHAR bar) { currentBar = bar; }
 	void setChan(UCHAR ch) { currentChan = ch; }
 	void setCurrent(UCHAR bar, UCHAR ch);
+
 	int create(const NoteModel& note);
 	NoteModel& get(int id);
 	std::unordered_map<int, NoteModel>& get();
+	std::unordered_map<int, NoteModel>& get(UCHAR bar, UCHAR ch);
 	int update(int id, const NoteModel& note);
 	void remove(int id);
+	void remove(UCHAR bar, UCHAR ch, int id);
 	//void clearCurrent(UCHAR level);
 
 	ChannelInfo& getChannelInfo() { return chanInfos[currentChan]; }

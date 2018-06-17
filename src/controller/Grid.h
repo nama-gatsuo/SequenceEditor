@@ -31,6 +31,10 @@ public:
 		return data[bar][ch];
 	}
 
+	Grid& get(UCHAR bar, UCHAR ch) {
+		return data[bar][ch];
+	}
+
 	void setBar(UCHAR bar) {
 		this->bar = bar;
 	}

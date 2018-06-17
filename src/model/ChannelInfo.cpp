@@ -62,7 +62,7 @@ void ChannelInfo::drawGui() {
 	ImGui::Selectable("Loop", &isRandomLoop, 0, ImVec2(60, 30));
 	bool b = false;
 	if (ImGui::Selectable("Exec", &b, 0, ImVec2(60, 30))) {
-		ExecRandom e(0, chIndex);
+		ExecRandom e(10, chIndex);
 		ofNotifyEvent(EventsEntity::execRandom, e);
 	}
 

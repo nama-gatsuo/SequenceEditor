@@ -51,8 +51,25 @@ void ScoreManager::setup(UCHAR beat, UCHAR barCount, UCHAR pitchCount) {
 
 void ScoreManager::bang(UCHAR barNum, UCHAR beatNum) {
 
+	// check randomize
+	if (beatNum == 0) {
+
+		for (auto& chInfo : chanInfos) {
+
+			if (chInfo.isRandomLoop) {
+
+				ExecRandom e(barNum, chInfo.chIndex);
+				ofNotifyEvent(EventsEntity::execRandom, e);
+
+			}
+
+		}
+
+	}
+
 	UCHAR ch = 0;
 	for (BarModel& bar : midis[barNum]) {
+
 		if (!bar[beatNum].empty()) {
 
 			auto& info = getChannelInfo(ch);
@@ -85,8 +102,8 @@ void ScoreManager::setCurrent(UCHAR bar, UCHAR ch) {
 
 int ScoreManager::create(const NoteModel& note) {
 
-	UCHAR b = currentBar;
-	UCHAR c = currentChan;
+	UCHAR c = note.ch;
+	UCHAR b = note.barNum;
 
 	// y value (pitch) is Key of map
 	auto& s = midis[b][c][note.x];
@@ -124,6 +141,10 @@ std::unordered_map<int, NoteModel>& ScoreManager::get() {
 	return notes[currentBar][currentChan];
 }
 
+std::unordered_map<int, NoteModel>& ScoreManager::get(UCHAR bar, UCHAR ch) {
+	return notes[bar][ch];
+}
+
 int ScoreManager::update(int id, const NoteModel& note) {
 	remove(id); // deleted note reference
 	return create(note);
@@ -135,6 +156,8 @@ void ScoreManager::remove(int id) {
 	UCHAR c = currentChan;
 
 	NoteModel& n = notes[b][c][id];
+	if (n.x > 15) return;
+	
 	auto& beatAndBar = calcEnd(n.x, n.barNum, n.duration);
 
 	auto& s = midis[b][c][n.x];
@@ -146,13 +169,19 @@ void ScoreManager::remove(int id) {
 	notes[b][c].erase(id);
 }
 
-//void ScoreManager::clearCurrent(UCHAR level) {
-//	UCHAR c = currentChan;
-//	UCHAR b = currentBar;
-//
-//	
-//
-//}
+void ScoreManager::remove(UCHAR bar, UCHAR ch, int id) {
+
+	NoteModel& n = notes[bar][ch][id];
+	auto& beatAndBar = calcEnd(n.x, n.barNum, n.duration);
+
+	auto& s = midis[bar][ch][n.x];
+	s.erase(n.midiId[0]);
+
+	auto& e = midis[beatAndBar.second][ch][beatAndBar.first];
+	e.erase(n.midiId[1]);
+
+	notes[bar][ch].erase(id);
+}
 
 std::pair<UCHAR, UCHAR> ScoreManager::calcEnd(UCHAR startBeat, UCHAR startBar, UCHAR duration) const {
 
