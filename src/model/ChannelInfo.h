@@ -21,8 +21,8 @@ public:
 	
 	static std::vector<vector<int>> scaleStep;
 
-	UCHAR chIndex;
-	UCHAR chNumInDAW;
+	unsigned char chIndex;
+	unsigned char chNumInDAW;
 	string name;
 	float hue;
 
@@ -31,7 +31,7 @@ public:
 	ImVec4 colorHeader;
 
 	void drawGui();
-	UCHAR translateMidi(int midi) const;
+	unsigned char translateMidi(int midi) const;
 	
 	// random seeds
 	bool isRandomLoop = false;

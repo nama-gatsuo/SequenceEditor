@@ -181,9 +181,9 @@ void UIManager::drawGrid() const {
 
 	
 	// rhythm guide
-	UCHAR cbeat = sequencer->getCurrentBeat();
-	UCHAR cbar = sequencer->getCurrentBar();
-	UCHAR bar = grids.getBar();
+	unsigned char cbeat = sequencer->getCurrentBeat();
+	unsigned char cbar = sequencer->getCurrentBar();
+	unsigned char bar = grids.getBar();
 	
 	if (cbar == bar) {
 		int o = 4;
@@ -210,9 +210,9 @@ void UIManager::drawGrid() const {
 	auto& pairs = score->get();
 	ofPushStyle();
 	for (auto& pair : pairs) {
-		UCHAR y = pair.second.y;
-		UCHAR x = pair.second.x;
-		UCHAR level = pair.second.level;
+		unsigned char y = pair.second.y;
+		unsigned char x = pair.second.x;
+		unsigned char level = pair.second.level;
 
 		if (y > 15 || x > 15 || level > 3) continue;
 
@@ -370,22 +370,22 @@ bool UIManager::isMouseFormer(int x) const {
 	return (x / (int)(gridSize * 0.5)) % 2 == 0;
 }
 
-void UIManager::clear(UCHAR bar, UCHAR ch, UCHAR level) {
+void UIManager::clear(unsigned char bar, unsigned char ch, unsigned char level) {
 	
 	auto& g = grids.get(bar, ch);
 	
-	for (UCHAR x = 0; x < BEAT; x++) {
-		for (UCHAR y = 0; y < PITCH; y++) {
-			UCHAR id = g[x][y][0];
-			UCHAR lev = g[x][y][1];
+	for (unsigned char x = 0; x < BEAT; x++) {
+		for (unsigned char y = 0; y < PITCH; y++) {
+			unsigned char id = g[x][y][0];
+			unsigned char lev = g[x][y][1];
 
 			if (lev == level) {
 				g[x][y] = { -1, -1 };
-				UCHAR d = score->get(bar, ch)[id].duration;
+				unsigned char d = score->get(bar, ch)[id].duration;
 
 				if (d > 15 || y > 15 || x > 15) continue;
 
-				for (UCHAR i = 0; i < d; i++) {
+				for (unsigned char i = 0; i < d; i++) {
 					g[x+i][y] = { -1, -1 };
 				}
 
@@ -405,7 +405,7 @@ void UIManager::randomize(ExecRandom& e) {
 	int randomChordNum = score->getChannelInfo(e.ch).randomChordNum;
 	int velRange = score->getChannelInfo(e.ch).velocityRange;
 
-	UCHAR b = e.bar > 3 ? grids.getBar() : e.bar;
+	unsigned char b = e.bar > 3 ? grids.getBar() : e.bar;
 	
 	clear(b, e.ch, 3);
 	

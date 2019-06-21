@@ -1,11 +1,11 @@
 #include "ScoreManager.h"
 
-UCHAR ScoreManager::beat = 0;
-UCHAR ScoreManager::barCount = 0;
-UCHAR ScoreManager::channelCount = 0;
-UCHAR ScoreManager::pitchCount = 0;
+unsigned char ScoreManager::beat = 0;
+unsigned char ScoreManager::barCount = 0;
+unsigned char ScoreManager::channelCount = 0;
+unsigned char ScoreManager::pitchCount = 0;
 
-void ScoreManager::setup(UCHAR beat, UCHAR barCount, UCHAR pitchCount) {
+void ScoreManager::setup(unsigned char beat, unsigned char barCount, unsigned char pitchCount) {
 	this->beat = beat;
 	this->barCount = barCount;
 	this->pitchCount = pitchCount;
@@ -49,7 +49,7 @@ void ScoreManager::setup(UCHAR beat, UCHAR barCount, UCHAR pitchCount) {
 	ChannelInfo::scaleStep[3] = { 0, 2, 4, 7, 9 };
 }
 
-void ScoreManager::bang(UCHAR barNum, UCHAR beatNum) {
+void ScoreManager::bang(unsigned char barNum, unsigned char beatNum) {
 
 	// check randomize
 	if (beatNum == 0) {
@@ -67,7 +67,7 @@ void ScoreManager::bang(UCHAR barNum, UCHAR beatNum) {
 
 	}
 
-	UCHAR ch = 0;
+	unsigned char ch = 0;
 	for (BarModel& bar : midis[barNum]) {
 
 		if (!bar[beatNum].empty()) {
@@ -78,7 +78,7 @@ void ScoreManager::bang(UCHAR barNum, UCHAR beatNum) {
 				auto& note = pair.second;
 
 				// midi translate
-				UCHAR midiNote = info.translateMidi(note->y);
+				unsigned char midiNote = info.translateMidi(note->y);
 				
 				if (note->isAttack) {
 					if (info.isActive[note->level]) {
@@ -95,7 +95,7 @@ void ScoreManager::bang(UCHAR barNum, UCHAR beatNum) {
 
 }
 
-void ScoreManager::setCurrent(UCHAR bar, UCHAR ch) {
+void ScoreManager::setCurrent(unsigned char bar, unsigned char ch) {
 	currentBar = bar;
 	currentChan = ch;
 }
@@ -103,8 +103,8 @@ void ScoreManager::setCurrent(UCHAR bar, UCHAR ch) {
 int ScoreManager::create(const NoteModel& note) {
 
 	if (note.x > 15 || note.y > 15) return -1;
-	UCHAR c = note.ch;
-	UCHAR b = note.barNum;
+	unsigned char c = note.ch;
+	unsigned char b = note.barNum;
 
 	// y value (pitch) is Key of map
 	auto& s = midis[b][c][note.x];
@@ -142,7 +142,7 @@ std::unordered_map<int, NoteModel>& ScoreManager::get() {
 	return notes[currentBar][currentChan];
 }
 
-std::unordered_map<int, NoteModel>& ScoreManager::get(UCHAR bar, UCHAR ch) {
+std::unordered_map<int, NoteModel>& ScoreManager::get(unsigned char bar, unsigned char ch) {
 	return notes[bar][ch];
 }
 
@@ -153,8 +153,8 @@ int ScoreManager::update(int id, const NoteModel& note) {
 
 void ScoreManager::remove(int id) {
 
-	UCHAR b = currentBar;
-	UCHAR c = currentChan;
+	auto b = currentBar;
+	auto c = currentChan;
 
 	NoteModel& n = notes[b][c][id];
 	if (n.x > 15) return;
@@ -170,7 +170,7 @@ void ScoreManager::remove(int id) {
 	notes[b][c].erase(id);
 }
 
-void ScoreManager::remove(UCHAR bar, UCHAR ch, int id) {
+void ScoreManager::remove(unsigned char bar, unsigned char ch, int id) {
 
 	NoteModel& n = notes[bar][ch][id];
 	auto& beatAndBar = calcEnd(n.x, n.barNum, n.duration);
@@ -184,10 +184,10 @@ void ScoreManager::remove(UCHAR bar, UCHAR ch, int id) {
 	notes[bar][ch].erase(id);
 }
 
-std::pair<UCHAR, UCHAR> ScoreManager::calcEnd(UCHAR startBeat, UCHAR startBar, UCHAR duration) const {
+std::pair<unsigned char, unsigned char> ScoreManager::calcEnd(unsigned char startBeat, unsigned char startBar, unsigned char duration) const {
 
-	UCHAR endBeat = startBeat + duration;
-	UCHAR endBar = startBar;
+	unsigned char endBeat = startBeat + duration;
+	unsigned char endBar = startBar;
 	if (endBeat >= beat) {
 		endBeat -= beat;
 		endBar++;

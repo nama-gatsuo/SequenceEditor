@@ -14,11 +14,11 @@ public:
 		midiOut.closePort();
 	}
 
-	void sendMidiOn(UCHAR ch, UCHAR midiNum, UCHAR velocity) {
+	void sendMidiOn(unsigned char ch, unsigned char midiNum, unsigned char velocity) {
 		midiOut.sendNoteOn(ch, midiNum, velocity);
 	}
 
-	void sendMidiOff(UCHAR ch, UCHAR midiNum) {
+	void sendMidiOff(unsigned char ch, unsigned char midiNum) {
 		midiOut.sendNoteOff(ch, midiNum);
 	}
 	

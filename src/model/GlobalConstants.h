@@ -2,8 +2,8 @@
 
 class ScoreManager;
 
-static UCHAR& BEAT = ScoreManager::beat;
-static UCHAR& BAR = ScoreManager::barCount;
-static UCHAR& CHANNEL = ScoreManager::channelCount;
-static UCHAR& PITCH = ScoreManager::pitchCount;
-static UCHAR MAX_BAR = 4;
+static unsigned char& BEAT = ScoreManager::beat;
+static unsigned char& BAR = ScoreManager::barCount;
+static unsigned char& CHANNEL = ScoreManager::channelCount;
+static unsigned char& PITCH = ScoreManager::pitchCount;
+static unsigned char MAX_BAR = 4;

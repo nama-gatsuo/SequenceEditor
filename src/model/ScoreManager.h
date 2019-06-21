@@ -6,51 +6,51 @@
 
 class ScoreManager {
 public:
-	void setup(UCHAR beat, UCHAR barCount, UCHAR pitchCount);
+	void setup(unsigned char beat, unsigned char barCount, unsigned char pitchCount);
 	void loadJson(const string& file) {}
 
 	// for sequencer IF
-	void bang(UCHAR barNum, UCHAR beatNum);
+	void bang(unsigned char barNum, unsigned char beatNum);
 
 	// for UI IF: CRUD
 	// return id
-	void setBar(UCHAR bar) { currentBar = bar; }
-	void setChan(UCHAR ch) { currentChan = ch; }
-	void setCurrent(UCHAR bar, UCHAR ch);
+	void setBar(unsigned char bar) { currentBar = bar; }
+	void setChan(unsigned char ch) { currentChan = ch; }
+	void setCurrent(unsigned char bar, unsigned char ch);
 
 	int create(const NoteModel& note);
 	NoteModel& get(int id);
 	std::unordered_map<int, NoteModel>& get();
-	std::unordered_map<int, NoteModel>& get(UCHAR bar, UCHAR ch);
+	std::unordered_map<int, NoteModel>& get(unsigned char bar, unsigned char ch);
 	int update(int id, const NoteModel& note);
 	void remove(int id);
-	void remove(UCHAR bar, UCHAR ch, int id);
-	//void clearCurrent(UCHAR level);
+	void remove(unsigned char bar, unsigned char ch, int id);
+	//void clearCurrent(unsigned char level);
 
 	ChannelInfo& getChannelInfo() { return chanInfos[currentChan]; }
-	ChannelInfo& getChannelInfo(UCHAR index) { return chanInfos[index]; }
+	ChannelInfo& getChannelInfo(unsigned char index) { return chanInfos[index]; }
 
 	void drawChannelInfo();
 
 	// setter & getter
-	UCHAR getBeat() const { return beat; }
-	UCHAR getBarCount() const { return barCount; }
-	UCHAR getChannelCount() const { return channelCount; }
+	unsigned char getBeat() const { return beat; }
+	unsigned char getBarCount() const { return barCount; }
+	unsigned char getChannelCount() const { return channelCount; }
 
-	static UCHAR beat;
-	static UCHAR barCount;
-	static UCHAR channelCount;
-	static UCHAR pitchCount;
+	static unsigned char beat;
+	static unsigned char barCount;
+	static unsigned char channelCount;
+	static unsigned char pitchCount;
 
 	// for visual IF: get note
 	vector<vector<BarModel>>& getMidis() { return midis; }
 	vector<vector<std::unordered_map<int, NoteModel>>>& getNotes() { return notes; }
 
 private:
-	std::pair<UCHAR, UCHAR> calcEnd(UCHAR startBeat, UCHAR startBar, UCHAR duration) const;
+	std::pair<unsigned char, unsigned char> calcEnd(unsigned char startBeat, unsigned char startBar, unsigned char duration) const;
 
-	UCHAR currentBar;
-	UCHAR currentChan;
+	unsigned char currentBar;
+	unsigned char currentChan;
 
 	// bar:     4 bars
 	// channel: 16 instruments

@@ -17,8 +17,8 @@ public:
 
 	void update(ScoreManager& score, Sequencer& sequnecer) {
 		auto& m = score.getNotes();
-		UCHAR bar = sequnecer.getCurrentBar();
-		UCHAR beat = sequnecer.getCurrentBeat();
+		unsigned char bar = sequnecer.getCurrentBar();
+		unsigned char beat = sequnecer.getCurrentBeat();
 
 		num = 0;
 		ofPixels& colPix = colData.getPixelsRef();
@@ -39,9 +39,9 @@ public:
 
 				for (auto& n : ch) {
 
-					UCHAR x = n.second.x;
-					UCHAR y = n.second.y;
-					UCHAR l = n.second.level;
+					unsigned char x = n.second.x;
+					unsigned char y = n.second.y;
+					unsigned char l = n.second.level;
 					
 					if (l > 3) continue;
 
@@ -49,10 +49,10 @@ public:
 					colPix.setColor(num, 0, ofFloatColor(c.x, c.y, c.z));
 					posPix.setColor(num, 0, ofFloatColor(chIndex/64., y/64., (x + barCount * 16) /64.));
 					
-					UCHAR ac = chInfo.isActive[l] ? 1 : 0;
-					UCHAR v = n.second.velocity;
-					UCHAR d = n.second.duration;
-					UCHAR at = (isActiveBar && x == beat) ? 1 : 0;
+					unsigned char ac = chInfo.isActive[l] ? 1 : 0;
+					unsigned char v = n.second.velocity;
+					unsigned char d = n.second.duration;
+					unsigned char at = (isActiveBar && x == beat) ? 1 : 0;
 
 					unitPix.setColor(num, 0, ofFloatColor(ac, v/128., d/16., at));
 

@@ -75,7 +75,7 @@ void ChannelInfo::drawGui() {
 
 }
 
-UCHAR ChannelInfo::translateMidi(int h) const {
+unsigned char ChannelInfo::translateMidi(int h) const {
 	int oct = octave + 2;
 	int k = static_cast<int>(key);
 	int si = static_cast<int>(scale);

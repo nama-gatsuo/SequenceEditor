@@ -23,7 +23,7 @@ private:
 class GridUI {
 public:
 	GridUI() {};
-	GridUI(UCHAR ch, UCHAR bar, UCHAR pitch, UCHAR beat) : ch(ch), bar(bar) {
+	GridUI(unsigned char ch, unsigned char bar, unsigned char pitch, unsigned char beat) : ch(ch), bar(bar) {
 		data.assign(bar, vector<Grid>(ch, Grid(beat, pitch)));
 	}
 
@@ -31,15 +31,15 @@ public:
 		return data[bar][ch];
 	}
 
-	Grid& get(UCHAR bar, UCHAR ch) {
+	Grid& get(unsigned char bar, unsigned char ch) {
 		return data[bar][ch];
 	}
 
-	void setBar(UCHAR bar) {
+	void setBar(unsigned char bar) {
 		this->bar = bar;
 	}
 
-	void setChan(UCHAR ch, float hue) {
+	void setChan(unsigned char ch, float hue) {
 		this->ch = ch;
 		
 		for (int i = 0; i < color.size(); i++) {
@@ -49,13 +49,13 @@ public:
 		ofBackground(color[2] * 0.2);
 	}
 
-	UCHAR getBar() const { return bar; }
-	UCHAR getChan() const { return ch; }
+	unsigned char getBar() const { return bar; }
+	unsigned char getChan() const { return ch; }
 	const ofFloatColor& getColor(int i) const { return color[i]; }
 
 private:
-	UCHAR bar;
-	UCHAR ch;
+	unsigned char bar;
+	unsigned char ch;
 	std::array<ofFloatColor, 4> color;
 
 	// bar - ch - x(beat) - y(pitch)

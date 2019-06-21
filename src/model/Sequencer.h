@@ -30,8 +30,8 @@ public:
 	
 	}
 	
-	UCHAR getCurrentBeat() const { return currentBeat; }
-	UCHAR getCurrentBar() const { return currentBar; }
+	unsigned char getCurrentBeat() const { return currentBeat; }
+	unsigned char getCurrentBar() const { return currentBar; }
 	UINT getBpm() const { return bpm; }
 	
 	void setBpm(UINT bpm) {
@@ -45,7 +45,7 @@ private:
 	RhythmMachine rhythm;
 
 	ULONG globalBeat;
-	UCHAR currentBeat;
-	UCHAR currentBar;
+	unsigned char currentBeat;
+	unsigned char currentBar;
 	UINT bpm;
 };

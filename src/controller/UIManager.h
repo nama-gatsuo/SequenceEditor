@@ -32,7 +32,7 @@ private:
 	void drawStateInfo() const;
 	bool isMouseFormer(int x) const;
 
-	void clear(UCHAR bar, UCHAR ch, UCHAR level);
+	void clear(unsigned char bar, unsigned char ch, unsigned char level);
 	void randomize(ExecRandom& e);
 
 
