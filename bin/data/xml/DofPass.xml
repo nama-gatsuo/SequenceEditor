@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<DofPass>
+	<active>1</active>
+	<endpoint_coc>0.9, 0.6</endpoint_coc>
+	<focul_range>0.1, 0.3</focul_range>
+	<BlurPass>
+		<active>1</active>
+		<preShrink>2</preShrink>
+		<sampleStep>1</sampleStep>
+		<blurRes>12</blurRes>
+	</BlurPass>
+</DofPass>

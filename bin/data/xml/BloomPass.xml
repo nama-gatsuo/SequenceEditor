@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<BloomPass>
+	<active>1</active>
+	<luma_threshold>0.5</luma_threshold>
+	<strength>1</strength>
+	<BlurPass>
+		<active>1</active>
+		<preShrink>2</preShrink>
+		<sampleStep>1</sampleStep>
+		<blurRes>12</blurRes>
+	</BlurPass>
+</BloomPass>

@@ -56,8 +56,8 @@ void UIManager::draw(int offsetX, int offsetY) {
 	ImGuiWindowFlags window_flags = 0;
 
 	gui.begin();
-	ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImColor::ImColor(0.));
-	ImGui::PushStyleColor(ImGuiCol_TitleBg, ImColor::ImColor(0.));
+	ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4::ImVec4(0, 0, 0, 0));
+	ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4::ImVec4(0, 0, 0, 0));
 	
 	// channel select
 	ImGui::Begin("ChannelSelect", &isDraw, window_flags);
@@ -421,8 +421,10 @@ void UIManager::randomize(ExecRandom& e) {
 
 					int vel = ofClamp(state.defaultVelocity + velRange * ofRandom(-1, 1), 0, 128);
 
-					NoteModel n(e.ch, b, i, currentY, vel, 1, 3);
-					
+					NoteModel n{
+						e.ch, b, i, currentY, vel, 1, 3
+					};
+
 					int id = score->create(n);
 
 					grids.get(b, e.ch)[i][currentY] = { id, 3 };

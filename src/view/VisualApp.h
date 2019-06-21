@@ -3,7 +3,7 @@
 #include "ScoreManager.h"
 #include "VisBoxes.h"
 #include "ofxDeferredShading.h"
-#include "ofxDeferredParams.h"
+#include "ofxDeferredHelper.h"
 
 using namespace glm;
 using namespace ofxDeferred;
@@ -15,14 +15,12 @@ public:
 		ofSetVerticalSync(true);
 		ofSetWindowTitle("visual");
 		ofEnableDepthTest();
-		ofToggleFullscreen();
+		//ofToggleFullscreen();
 
 		vb.setup();
 		
-		deferred.init(1920, 1080);
-		params.setup(deferred);
-		
-
+		helper.init(1920, 1080);
+		isDebug = true;
 	};
 
 	void update() {
@@ -34,19 +32,25 @@ public:
 	};
 	void draw() {
 
-		params.getShadow()->beginShadowMap(true);
-		vb.draw(params.getShadow()->getCamera(), true);
-		params.getPointLight()->drawLights(params.getShadow()->getCamera(), true);
-		params.getShadow()->endShadowMap();
+		helper.render([&](float lds, bool isShadow) {
+			vb.draw(lds, isShadow);
+		}, cam);
 
-		deferred.begin(cam);
-		vb.draw(cam, false);
-		params.getPointLight()->drawLights(cam, false);
-		deferred.end();
-
-		params.drawGui();
+		if (isDebug) {
+			helper.drawGbuffer();
+			helper.drawGui();
+		}
+		
 		ofDrawBitmapString("fps: " + ofToString(ofGetFrameRate()), 20, 20);
 	};
+	
+	void keyPressed(int key) {
+		if (key == 'd') {
+			isDebug = !isDebug;
+		} else if (key == 's') {
+			helper.save();
+		}
+	}
 
 	ScoreManager* score;
 	Sequencer* sequencer;
@@ -55,8 +59,8 @@ private:
 	//UIManager* ui;
 	ofEasyCam cam;
 	VisBox vb;
-
-	ofxDeferredProcessing deferred;
 	
-	ofxDeferredParams params;
+	ofxDeferred::Helper helper;
+	bool isDebug;
+
 };

@@ -27,8 +27,8 @@ public:
 	float hue;
 
 	array<bool, 4> isActive;
-	array<ImColor, 4> colors;
-	ImColor colorHeader;
+	array<ImVec4, 4> colors;
+	ImVec4 colorHeader;
 
 	void drawGui();
 	UCHAR translateMidi(int midi) const;

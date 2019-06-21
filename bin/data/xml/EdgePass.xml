@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<EdgePass>
+	<active>1</active>
+	<edge_color>0, 0, 0, 1</edge_color>
+	<bg_color>1, 0.991965, 0.967859, 1</bg_color>
+	<use_read_as_bg>1</use_read_as_bg>
+</EdgePass>

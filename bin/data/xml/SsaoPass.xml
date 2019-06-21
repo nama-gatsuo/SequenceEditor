@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<SsaoPass>
+	<active>0</active>
+	<occlusion_radius>5</occlusion_radius>
+	<darkness>1</darkness>
+</SsaoPass>

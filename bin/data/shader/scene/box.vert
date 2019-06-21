@@ -6,9 +6,7 @@ in vec4 normal; // oF Default
 in vec4 color; // oF Default
 in vec2 texcoord; // oF Default
 
-uniform float farClip;
-uniform float nearClip;
-
+uniform float lds;
 uniform sampler2DRect col;
 uniform sampler2DRect pos;
 uniform sampler2DRect unit;
@@ -41,7 +39,7 @@ void main(){
     vUv = texcoord;
     vP = modelViewMatrix * vec4(pos, 1.);
     vN = normal.xyz;
-    vD = - vP.z / (farClip - nearClip);
+    vD = - vP.z * lds;
     vC = c;
     gl_Position = modelViewProjectionMatrix * vec4(pos, 1.);
 

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ShadowLightPass>
+	<active>1</active>
+	<near_clip>50</near_clip>
+	<far_clip>4417.23</far_clip>
+	<view_port_size>2048</view_port_size>
+	<darkness>0.395833</darkness>
+	<ambient_color>0.6, 0.6, 0.6, 1</ambient_color>
+	<diffuse_color>0.9, 0.9, 0.9, 1</diffuse_color>
+	<source_position>100, 306.503, -24.3809</source_position>
+	<source_look>0, -3.48291, 0</source_look>
+</ShadowLightPass>

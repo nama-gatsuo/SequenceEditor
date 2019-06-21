@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<PointLightPass>
+	<active>1</active>
+	<lightBrightness>6.66667</lightBrightness>
+	<lighst_1>
+		<diffuse_color>0.634266, 0.782546, 0.329353, 1</diffuse_color>
+		<specular_color>0.539897, 0.55764, 0.8545, 1</specular_color>
+		<position>353.893, 13.5014, 249.348</position>
+		<radius>524.626</radius>
+		<intensity>0.231666</intensity>
+	</lighst_1>
+	<lighst_2>
+		<diffuse_color>0.879278, 0.697073, 0.645524, 1</diffuse_color>
+		<specular_color>0.763036, 0.721213, 0.526145, 1</specular_color>
+		<position>699.02, 0.317383, -443.007</position>
+		<radius>203.155</radius>
+		<intensity>0.953154</intensity>
+	</lighst_2>
+	<lighst_3>
+		<diffuse_color>0.707434, 0.440611, 0.400854, 1</diffuse_color>
+		<specular_color>0.772686, 0.526365, 0.549144, 1</specular_color>
+		<position>-364.098, 61.2079, -301.498</position>
+		<radius>241.73</radius>
+		<intensity>0.786065</intensity>
+	</lighst_3>
+	<lighst_4>
+		<diffuse_color>0.527045, 0.72555, 0.546187, 1</diffuse_color>
+		<specular_color>0.945048, 0.80354, 0.682742, 1</specular_color>
+		<position>467.47, 703.854, 386.511</position>
+		<radius>463.129</radius>
+		<intensity>0.0881069</intensity>
+	</lighst_4>
+	<lighst_5>
+		<diffuse_color>0.734971, 0.248003, 0.395471, 1</diffuse_color>
+		<specular_color>0.698874, 0.422541, 0.71843, 1</specular_color>
+		<position>-186.505, -677.682, -42.7015</position>
+		<radius>303.281</radius>
+		<intensity>0.334758</intensity>
+	</lighst_5>
+	<lighst_6>
+		<diffuse_color>0.800491, 0.556334, 0.752809, 1</diffuse_color>
+		<specular_color>0.885537, 0.564434, 0.708066, 1</specular_color>
+		<position>-449.892, 420.545, -393.054</position>
+		<radius>520.085</radius>
+		<intensity>0.493789</intensity>
+	</lighst_6>
+</PointLightPass>

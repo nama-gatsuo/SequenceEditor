@@ -132,7 +132,16 @@ void UIState::onMouseReleased() {
 			}
 
 			if (isDragBack) x = start;
-			NoteModel n(grids->getChan(), grids->getBar(), x, y, defaultVelocity, d, currentEditLevel);
+
+			NoteModel n{ 
+				grids->getChan(),
+				grids->getBar(),
+				x, y, 
+				defaultVelocity,
+				d,
+				currentEditLevel
+			};
+
 			int id = score->create(n);
 			for (int i = 0; i < d; i++) {
 				grids->get()[x + i][y] = { id, currentEditLevel };

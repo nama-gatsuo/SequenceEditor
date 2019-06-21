@@ -1,4 +1,4 @@
-ofxDeferredParams
+ofxDeferredHelper
 ofxDeferredShading
 ofxGui
 ofxImGui

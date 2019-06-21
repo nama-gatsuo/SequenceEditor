@@ -46,7 +46,7 @@ public:
 					if (l > 3) continue;
 
 					auto& c = chInfo.colors[l];
-					colPix.setColor(num, 0, ofFloatColor(c.Value.x, c.Value.y, c.Value.z));
+					colPix.setColor(num, 0, ofFloatColor(c.x, c.y, c.z));
 					posPix.setColor(num, 0, ofFloatColor(chIndex/64., y/64., (x + barCount * 16) /64.));
 					
 					UCHAR ac = chInfo.isActive[l] ? 1 : 0;
@@ -69,7 +69,7 @@ public:
 		unitData.setFromPixels(unitPix);
 	}
 
-	void draw(const ofCamera& cam, bool isShadow) {
+	void draw(float lds, bool isShadow) {
 
 		
 		shader.begin();
@@ -79,8 +79,7 @@ public:
 		shader.setUniform1i("num", num);
 		shader.setUniform1f("size", size);
 
-		shader.setUniform1f("farClip", cam.getFarClip());
-		shader.setUniform1f("nearClip", cam.getNearClip());
+		shader.setUniform1f("lds", lds);
 		shader.setUniform1i("isShadow", isShadow ? 1 : 0);
 
 		mesh.drawInstanced(OF_MESH_FILL, num);
