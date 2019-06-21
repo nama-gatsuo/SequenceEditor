@@ -44,8 +44,8 @@ private:
 	ScoreManager * score;
 	RhythmMachine rhythm;
 
-	ULONG globalBeat;
+	unsigned long globalBeat;
 	unsigned char currentBeat;
 	unsigned char currentBar;
-	UINT bpm;
+	unsigned int bpm;
 };
