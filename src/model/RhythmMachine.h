@@ -1,5 +1,5 @@
 #pragma once
-#include "ofMain.h"
+#include "ofThread.h"
 #include "Events.h"
 
 class RhythmMachine : public ofThread {

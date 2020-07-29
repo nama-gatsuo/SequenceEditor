@@ -23,7 +23,7 @@ void main(void){
             outputColor2 = vec4(vN, vD);
         } else {
             if (vAc > 0.5) {
-                outputColor0 = vec4(vAt < 0.5 ? vC : vC * 6., 1.);
+                outputColor0 = vec4(vAt < 0.5 ? vC : vC * 2., 1.);
                 outputColor1 = vP;
                 outputColor2 = vec4(vN, vD);
             } else {

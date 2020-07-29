@@ -17,14 +17,15 @@ public:
 
 	void update(ScoreManager& score, Sequencer& sequnecer) {
 		auto& m = score.getNotes();
-		unsigned char bar = sequnecer.getCurrentBar();
-		unsigned char beat = sequnecer.getCurrentBeat();
+		uint8_t bar = sequnecer.getCurrentBar();
+		uint8_t beat = sequnecer.getCurrentBeat();
 
 		num = 0;
 		ofPixels& colPix = colData.getPixelsRef();
 		ofPixels& posPix = posData.getPixelsRef();
 		ofPixels& unitPix = unitData.getPixelsRef();
 		
+		barCount = score.getBarCount();
 		// bar block
 		int barCount = 0;
 		for (auto& bm : m) {
@@ -39,20 +40,20 @@ public:
 
 				for (auto& n : ch) {
 
-					unsigned char x = n.second.x;
-					unsigned char y = n.second.y;
-					unsigned char l = n.second.level;
+					uint8_t x = n.second.x;
+					uint8_t y = n.second.y;
+					uint8_t l = n.second.level;
 					
 					if (l > 3) continue;
 
-					auto& c = chInfo.colors[l];
+					const auto& c = chInfo.levels[l].color;
 					colPix.setColor(num, 0, ofFloatColor(c.x, c.y, c.z));
 					posPix.setColor(num, 0, ofFloatColor(chIndex/64., y/64., (x + barCount * 16) /64.));
 					
-					unsigned char ac = chInfo.isActive[l] ? 1 : 0;
-					unsigned char v = n.second.velocity;
-					unsigned char d = n.second.duration;
-					unsigned char at = (isActiveBar && x == beat) ? 1 : 0;
+					uint8_t ac = chInfo.levels[l].isActive ? 1 : 0;
+					uint8_t v = n.second.velocity;
+					uint8_t d = n.second.duration;
+					uint8_t at = (isActiveBar && x == beat) ? 1 : 0;
 
 					unitPix.setColor(num, 0, ofFloatColor(ac, v/128., d/16., at));
 
@@ -77,7 +78,9 @@ public:
 		shader.setUniformTexture("pos", posData.getTexture(), 1);
 		shader.setUniformTexture("unit", unitData.getTexture(), 2);
 		shader.setUniform1i("num", num);
+		shader.setUniform1i("barCount", barCount);
 		shader.setUniform1f("size", size);
+		
 
 		shader.setUniform1f("lds", lds);
 		shader.setUniform1i("isShadow", isShadow ? 1 : 0);
@@ -89,6 +92,7 @@ public:
 	}
 private:
 	float size;
+	int barCount;
 	ofShader shader;
 	ofVboMesh mesh;
 

@@ -1,10 +1,8 @@
 #pragma once
-#include "ofMain.h"
+
 #include "ScoreManager.h"
 #include "Grid.h"
 #include "Events.h"
-
-using namespace glm;
 
 class UIState {
 public:
@@ -18,14 +16,14 @@ public:
 	int currentEditLevel = 0;
 	int defaultVelocity = 64;
 
-	ivec2 current;
-	ivec2 pressed;
+	glm::ivec2 current;
+	glm::ivec2 pressed;
 	int noteId;
 
-	void onMouseMoved(const ivec2& index);
+	void onMouseMoved(const glm::ivec2& index);
 	void onMouseScrolled(float y);
 	void onMousePressed(bool isFormer);
-	void onMouseDragged(const ivec2& index);
+	void onMouseDragged(const glm::ivec2& index);
 	void onMouseReleased();
 
 private:

@@ -1,11 +1,10 @@
 #pragma once
-#include "ofMain.h"
 #include "ofxMidi.h"
 
 class MidiSender {
 public:
 	MidiSender() {
-		//midiOut.listPorts();
+		midiOut.listOutPorts();
 		/// LoopMidi = 1
 		midiOut.openPort(1);
 	}
@@ -14,11 +13,11 @@ public:
 		midiOut.closePort();
 	}
 
-	void sendMidiOn(unsigned char ch, unsigned char midiNum, unsigned char velocity) {
+	void sendMidiOn(int ch, int midiNum, int velocity) {
 		midiOut.sendNoteOn(ch, midiNum, velocity);
 	}
 
-	void sendMidiOff(unsigned char ch, unsigned char midiNum) {
+	void sendMidiOff(int ch, int midiNum) {
 		midiOut.sendNoteOff(ch, midiNum);
 	}
 	

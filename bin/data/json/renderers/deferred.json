@@ -1,0 +1,109 @@
+{
+    "deferred": {
+        "BgPass": {
+            "active": "1",
+            "fill_color": "0.528409, 0.40678, 0.398291, 1"
+        },
+        "BloomPass": {
+            "active": "1",
+            "luma_threshold": "0.2125",
+            "strength": "4.29167"
+        },
+        "DofPass": {
+            "BlurPass": {
+                "active": "1",
+                "blurRes": "12",
+                "preShrink": "1",
+                "sampleStep": "1"
+            },
+            "active": "1",
+            "bokeh": {
+                "bokehCocThres": "0.275424",
+                "bokehDepthCutoff": "0.03",
+                "bokehLumThres": "3.47458",
+                "bokehShapeId": "0",
+                "isActiveBokeh": "0",
+                "maxBokehCount": "839",
+                "maxBokehRadius": "100"
+            },
+            "endpoint_coc": "0.991525, 0.983051",
+            "focul_range": "0.0762712, 0.3"
+        },
+        "EdgePass": {
+            "active": "1",
+            "bg_color": "0, 0, 0, 1",
+            "depthEdgeStrength": "1",
+            "edge_color": "0, 0, 0, 1",
+            "normalEdgeStrength": "1",
+            "use_read_as_bg": "1"
+        },
+        "FogPass": {
+            "active": "0",
+            "depthFogStrength": "1",
+            "fogAmp": "0.2",
+            "fogCenter": "0.5",
+            "fogColor": "0.85, 0.85, 0.82, 1",
+            "fogFreq": "4, 4, 4",
+            "fogOffset": "0.4, 0.4, 0.4",
+            "fogPower": "1",
+            "fogRayStart": "400",
+            "noiseFogStrength": "1"
+        },
+        "PointLightPass": {
+            "active": "0",
+            "lightBrightness": "2.70833",
+            "light_0": {
+                "diffuse_color": "0.208823, 0.331938, 0.367977, 1",
+                "intensity": "0.645497",
+                "isActive": "1",
+                "position": "794.043, 635.786, -530.558",
+                "radius": "35.2332",
+                "specular_color": "0.415125, 0.882369, 0.471065, 1"
+            },
+            "light_1": {
+                "diffuse_color": "0.409763, 0.690109, 0.557018, 1",
+                "intensity": "0.111332",
+                "isActive": "1",
+                "position": "762.206, -587.396, 316.636",
+                "radius": "49.3853",
+                "specular_color": "0.461873, 0.668917, 0.95717, 1"
+            },
+            "light_2": {
+                "diffuse_color": "0.815573, 0.280389, 0.702478, 1",
+                "intensity": "0.565233",
+                "isActive": "1",
+                "position": "382.263, 522.013, -239.68",
+                "radius": "231.788",
+                "specular_color": "0.859334, 0.892276, 0.642384, 1"
+            },
+            "light_3": {
+                "diffuse_color": "0.283999, 0.618244, 0.434394, 1",
+                "intensity": "0.639668",
+                "isActive": "1",
+                "position": "-454.335, -127.616, 458.339",
+                "radius": "465.454",
+                "specular_color": "0.834852, 0.405182, 0.427924, 1"
+            }
+        },
+        "ShadowLightPass": {
+            "active": "0",
+            "ambient_color": "0.855932, 0.830508, 0.795455, 1",
+            "biasScalar": "0.00753333",
+            "darkness": "0.8875",
+            "diffuse_color": "0.923729, 0.927966, 0.927966, 1",
+            "isDrawSun": "0",
+            "isFrontCulling": "0",
+            "isShading": "1",
+            "isVolume": "0",
+            "scattering": "0.233333",
+            "source_look": "0, 0, 0",
+            "source_position": "100, 277.695, 1319.05",
+            "volumeStrength": "0.245833"
+        },
+        "SsaoPass": {
+            "active": "1",
+            "darkness": "0.266667",
+            "occlusion_radius": "1.25"
+        }
+    }
+}

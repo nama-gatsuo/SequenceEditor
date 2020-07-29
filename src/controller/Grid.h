@@ -1,6 +1,5 @@
 #pragma once
-#include "ofMain.h"
-#include "GlobalConstants.h"
+#include "ofColor.h"
 
 class Grid {
 public:
@@ -23,23 +22,23 @@ private:
 class GridUI {
 public:
 	GridUI() {};
-	GridUI(unsigned char ch, unsigned char bar, unsigned char pitch, unsigned char beat) : ch(ch), bar(bar) {
-		data.assign(bar, vector<Grid>(ch, Grid(beat, pitch)));
+	GridUI(uint8_t ch, uint8_t bar, uint8_t pitch, uint8_t beat) : ch(ch), bar(bar) {
+		data.assign(bar, std::vector<Grid>(ch, Grid(beat, pitch)));
 	}
 
 	Grid& get() {
 		return data[bar][ch];
 	}
 
-	Grid& get(unsigned char bar, unsigned char ch) {
+	Grid& get(uint8_t bar, uint8_t ch) {
 		return data[bar][ch];
 	}
 
-	void setBar(unsigned char bar) {
+	void setBar(uint8_t bar) {
 		this->bar = bar;
 	}
 
-	void setChan(unsigned char ch, float hue) {
+	void setChan(uint8_t ch, float hue) {
 		this->ch = ch;
 		
 		for (int i = 0; i < color.size(); i++) {
@@ -49,15 +48,15 @@ public:
 		ofBackground(color[2] * 0.2);
 	}
 
-	unsigned char getBar() const { return bar; }
-	unsigned char getChan() const { return ch; }
+	uint8_t getBar() const { return bar; }
+	uint8_t getChan() const { return ch; }
 	const ofFloatColor& getColor(int i) const { return color[i]; }
 
 private:
-	unsigned char bar;
-	unsigned char ch;
+	uint8_t bar;
+	uint8_t ch;
 	std::array<ofFloatColor, 4> color;
 
 	// bar - ch - x(beat) - y(pitch)
-	vector<vector<Grid>> data;
+	std::vector<std::vector<Grid>> data;
 };

@@ -1,67 +1,65 @@
 #pragma once
-#include "ofMain.h"
+
 #include "Models.h"
 #include "MidiSender.h"
 #include "ChannelInfo.h"
 
 class ScoreManager {
 public:
-	void setup(unsigned char beat, unsigned char barCount, unsigned char pitchCount);
+	ScoreManager() : 
+		beat(0), barCount(0), channelCount(0), pitchCount(0)
+	{}
+
+	void setup(uint8_t beat, uint8_t barCount, uint8_t pitchCount);
 	void loadJson(const string& file) {}
 
 	// for sequencer IF
-	void bang(unsigned char barNum, unsigned char beatNum);
+	void bang(uint8_t bar, uint8_t beat);
 
 	// for UI IF: CRUD
-	// return id
-	void setBar(unsigned char bar) { currentBar = bar; }
-	void setChan(unsigned char ch) { currentChan = ch; }
-	void setCurrent(unsigned char bar, unsigned char ch);
-
+	
+	// Create 
 	int create(const NoteModel& note);
-	NoteModel& get(int id);
-	std::unordered_map<int, NoteModel>& get();
-	std::unordered_map<int, NoteModel>& get(unsigned char bar, unsigned char ch);
-	int update(int id, const NoteModel& note);
-	void remove(int id);
-	void remove(unsigned char bar, unsigned char ch, int id);
+	std::unordered_map<int, NoteModel>& get(uint8_t bar, uint8_t channel);
+	const NoteModel& get(uint8_t bar, uint8_t channel, int id);
+	int update(uint8_t bar, uint8_t channel, int id, const NoteModel& note);
+	void remove(uint8_t bar, uint8_t ch, int id);
 	//void clearCurrent(unsigned char level);
-
-	ChannelInfo& getChannelInfo() { return chanInfos[currentChan]; }
-	ChannelInfo& getChannelInfo(unsigned char index) { return chanInfos[index]; }
+	
+	ChannelInfo& getChannelInfo(uint8_t index) { return chanInfos[index]; }
 
 	void drawChannelInfo();
 
 	// setter & getter
-	unsigned char getBeat() const { return beat; }
-	unsigned char getBarCount() const { return barCount; }
-	unsigned char getChannelCount() const { return channelCount; }
+	uint8_t getBeatCount() const { return beat; }
+	uint8_t getBarCount() const { return barCount; }
+	void setBarCount(uint8_t b) { barCount = b; }
 
-	static unsigned char beat;
-	static unsigned char barCount;
-	static unsigned char channelCount;
-	static unsigned char pitchCount;
+	uint8_t getChannelCount() const { return channelCount; }
+	uint8_t getPitchCount() const { return pitchCount; }
 
 	// for visual IF: get note
-	vector<vector<BarModel>>& getMidis() { return midis; }
-	vector<vector<std::unordered_map<int, NoteModel>>>& getNotes() { return notes; }
+	std::vector<std::vector<BarModel>>& getMidis() { return midis; }
+	std::vector<std::vector<std::unordered_map<int, NoteModel>>>& getNotes() { return notes; }
 
 private:
-	std::pair<unsigned char, unsigned char> calcEnd(unsigned char startBeat, unsigned char startBar, unsigned char duration) const;
+	std::pair<uint8_t, uint8_t> calcEnd(uint8_t startBeat, uint8_t startBar, uint8_t duration) const;
 
-	unsigned char currentBar;
-	unsigned char currentChan;
+	uint8_t beat;
+	uint8_t barCount;
+	uint8_t channelCount;
+	uint8_t pitchCount;
 
 	// bar:     4 bars
 	// channel: 16 instruments
-	vector<vector<BarModel>> midis;
+	std::vector<std::vector<BarModel>> midis;
 
 	// bar:     4 bars
 	// channel: 16 instruments
 	// (id, note)
-	vector<vector<std::unordered_map<int, NoteModel>>> notes;
+	std::vector<std::vector<std::unordered_map<int, NoteModel>>> notes;
 
-	vector<ChannelInfo> chanInfos;
+	std::vector<ChannelInfo> chanInfos;
 
 	MidiSender sender;
 

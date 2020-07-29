@@ -5,9 +5,6 @@
 #include "ofxDeferredShading.h"
 #include "ofxDeferredHelper.h"
 
-using namespace glm;
-using namespace ofxDeferred;
-
 class VisualApp : public ofBaseApp {
 public:
 	void setup() {
@@ -20,24 +17,25 @@ public:
 		vb.setup();
 		
 		helper.init(1920, 1080);
+		
 		isDebug = true;
 	};
 
 	void update() {
-		cam.setPosition(800 * cos(ofGetElapsedTimef() * 0.2), 100 * cos(ofGetElapsedTimef() * 0.1), 3200 * sin(ofGetElapsedTimef() * 0.2));
-		cam.lookAt(vec3(0, 0, 0));
+		cam.setPosition(800 * cos(ofGetElapsedTimef() * 0.2), 100 * cos(ofGetElapsedTimef() * 0.1), 800 * sin(ofGetElapsedTimef() * 0.2));
+		cam.lookAt(glm::vec3(0, 0, 0));
 
 		vb.update(*score, *sequencer);
 
 	};
 	void draw() {
 
-		helper.render([&](float lds, bool isShadow) {
-			vb.draw(lds, isShadow);
+		helper.render([&](const ofxDeferred::RenderInfo& info) {
+			vb.draw(info.lds, info.isShadow);
 		}, cam);
 
 		if (isDebug) {
-			helper.drawGbuffer();
+			helper.debugDraw();
 			helper.drawGui();
 		}
 		
@@ -48,7 +46,7 @@ public:
 		if (key == 'd') {
 			isDebug = !isDebug;
 		} else if (key == 's') {
-			helper.save();
+			helper.saveParams();
 		}
 	}
 

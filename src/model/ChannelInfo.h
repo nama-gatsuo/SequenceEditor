@@ -1,12 +1,15 @@
 #pragma once
-#include "ofMain.h"
+
 #include "Events.h"
 #include "ofxImGui.h"
 
 class ChannelInfo {
 public:
 	ChannelInfo();
-	ChannelInfo(int i, const string& name, float hue);
+	ChannelInfo(int index, const std::string& name, float hue);
+
+	void drawGui();
+	uint8_t translateMidi(int midi) const;
 
 	enum Scale {
 		CHROMATIC = 0, MAJOR, MINOR, PENTATONIC
@@ -19,24 +22,25 @@ public:
 
 	int octave;
 	
-	static std::vector<vector<int>> scaleStep;
+	static const std::vector<std::vector<int>> scaleStep;
 
-	unsigned char chIndex;
-	unsigned char chNumInDAW;
-	string name;
+	uint8_t channelIndex;
+	uint8_t channelIndexInDAW;
+	std::string name;
 	float hue;
 
-	array<bool, 4> isActive;
-	array<ImVec4, 4> colors;
+	uint8_t levelNum;
+	struct LevelInfo {
+		bool isActive;
+		ImVec4 color;
+	};
+
+	std::vector<LevelInfo> levels;
 	ImVec4 colorHeader;
 
-	void drawGui();
-	unsigned char translateMidi(int midi) const;
-	
-	// random seeds
-	bool isRandomLoop = false;
-	int randomChordNum = 1;
-	float randomNotesNum = 0.1;
-	int velocityRange = 10;
+	bool isRandomLoop;
+	int randomChordNum;
+	float randomNotesNum;
+	int velocityRange;
 
 };

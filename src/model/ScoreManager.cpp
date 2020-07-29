@@ -1,15 +1,9 @@
 #include "ScoreManager.h"
 
-unsigned char ScoreManager::beat = 0;
-unsigned char ScoreManager::barCount = 0;
-unsigned char ScoreManager::channelCount = 0;
-unsigned char ScoreManager::pitchCount = 0;
-
-void ScoreManager::setup(unsigned char beat, unsigned char barCount, unsigned char pitchCount) {
+void ScoreManager::setup(uint8_t beat, uint8_t barCount, uint8_t pitchCount) {
 	this->beat = beat;
 	this->barCount = barCount;
 	this->pitchCount = pitchCount;
-	channelCount = 0;
 
 	// load from json
 	ofJson json = ofLoadJson("json/channelInfo.json");
@@ -35,30 +29,24 @@ void ScoreManager::setup(unsigned char beat, unsigned char barCount, unsigned ch
 		}
 
 	} else {
-		channelCount = 16;
+		ofLogWarning() << "No json found!";
 	}
 
-	midis.assign(this->barCount, vector<BarModel>(channelCount));
-	notes.assign(this->barCount, vector<std::unordered_map<int, NoteModel>>(channelCount));
+	midis.assign(barCount, std::vector<BarModel>(channelCount));
+	notes.assign(barCount, std::vector<std::unordered_map<int, NoteModel>>(channelCount));
 
-	// create scale
-	ChannelInfo::scaleStep.assign(5, vector<int>());
-	ChannelInfo::scaleStep[0] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-	ChannelInfo::scaleStep[1] = { 0, 2, 4, 5, 7, 9, 11 };
-	ChannelInfo::scaleStep[2] = { 0, 2, 3, 5, 7, 8, 10 };
-	ChannelInfo::scaleStep[3] = { 0, 2, 4, 7, 9 };
 }
 
-void ScoreManager::bang(unsigned char barNum, unsigned char beatNum) {
+void ScoreManager::bang(uint8_t barNum, uint8_t beatNum) {
 
 	// check randomize
 	if (beatNum == 0) {
 
 		for (auto& chInfo : chanInfos) {
-
+			
 			if (chInfo.isRandomLoop) {
 
-				ExecRandom e(barNum, chInfo.chIndex);
+				ExecRandom e(barNum, chInfo.channelIndex);
 				ofNotifyEvent(EventsEntity::execRandom, e);
 
 			}
@@ -67,25 +55,26 @@ void ScoreManager::bang(unsigned char barNum, unsigned char beatNum) {
 
 	}
 
-	unsigned char ch = 0;
-	for (BarModel& bar : midis[barNum]) {
+	uint8_t ch = 0;
+	for (const BarModel& bar : midis[barNum]) {
 
 		if (!bar[beatNum].empty()) {
 
 			auto& info = getChannelInfo(ch);
 
-			for (auto& pair : bar[beatNum]) {
+			for (const auto& pair : bar[beatNum]) {
 				auto& note = pair.second;
 
 				// midi translate
-				unsigned char midiNote = info.translateMidi(note->y);
+				uint8_t midiNote = info.translateMidi(note->y);
 				
 				if (note->isAttack) {
-					if (info.isActive[note->level]) {
-						sender.sendMidiOn(ch + 1, midiNote, note->velocity);
+					if (info.levels[note->level].isActive) {
+						sender.sendMidiOn(info.channelIndexInDAW, midiNote, note->velocity);
+						//ofLogNotice() << "note: " << (int)midiNote << ", " << "vel: " << note->velocity;
 					}
 				}
-				else sender.sendMidiOff(ch + 1, midiNote);
+				else sender.sendMidiOff(info.channelIndexInDAW, midiNote);
 			}
 
 		}
@@ -95,16 +84,11 @@ void ScoreManager::bang(unsigned char barNum, unsigned char beatNum) {
 
 }
 
-void ScoreManager::setCurrent(unsigned char bar, unsigned char ch) {
-	currentBar = bar;
-	currentChan = ch;
-}
-
 int ScoreManager::create(const NoteModel& note) {
 
-	if (note.x > 15 || note.y > 15) return -1;
-	unsigned char c = note.ch;
-	unsigned char b = note.barNum;
+	if (note.x > beat - 1 || note.y > pitchCount - 1) return -1;
+	uint8_t c = note.ch;
+	uint8_t b = note.barNum;
 
 	// y value (pitch) is Key of map
 	auto& s = midis[b][c][note.x];
@@ -134,46 +118,24 @@ int ScoreManager::create(const NoteModel& note) {
 	return id;
 }
 
-NoteModel& ScoreManager::get(int id) {
-	return notes[currentBar][currentChan][id];
-}
 
-std::unordered_map<int, NoteModel>& ScoreManager::get() {
-	return notes[currentBar][currentChan];
-}
-
-std::unordered_map<int, NoteModel>& ScoreManager::get(unsigned char bar, unsigned char ch) {
+std::unordered_map<int, NoteModel>& ScoreManager::get(uint8_t bar, uint8_t ch) {
 	return notes[bar][ch];
 }
 
-int ScoreManager::update(int id, const NoteModel& note) {
-	remove(id); // deleted note reference
+const NoteModel& ScoreManager::get(uint8_t bar, uint8_t channel, int id) {
+	return notes[bar][channel][id];
+}
+
+int ScoreManager::update(uint8_t bar, uint8_t channel, int id, const NoteModel& note) {
+	remove(bar, channel, id); // deleted note reference
 	return create(note);
 }
 
-void ScoreManager::remove(int id) {
+void ScoreManager::remove(uint8_t bar, uint8_t ch, int id) {
 
-	auto b = currentBar;
-	auto c = currentChan;
-
-	NoteModel& n = notes[b][c][id];
-	if (n.x > 15) return;
-	
-	auto& beatAndBar = calcEnd(n.x, n.barNum, n.duration);
-
-	auto& s = midis[b][c][n.x];
-	s.erase(n.midiId[0]);
-
-	auto& e = midis[beatAndBar.second][c][beatAndBar.first];
-	e.erase(n.midiId[1]);
-
-	notes[b][c].erase(id);
-}
-
-void ScoreManager::remove(unsigned char bar, unsigned char ch, int id) {
-
-	NoteModel& n = notes[bar][ch][id];
-	auto& beatAndBar = calcEnd(n.x, n.barNum, n.duration);
+	const auto& n = notes[bar][ch][id];
+	const auto& beatAndBar = calcEnd(n.x, n.barNum, n.duration);
 
 	auto& s = midis[bar][ch][n.x];
 	s.erase(n.midiId[0]);
@@ -184,10 +146,10 @@ void ScoreManager::remove(unsigned char bar, unsigned char ch, int id) {
 	notes[bar][ch].erase(id);
 }
 
-std::pair<unsigned char, unsigned char> ScoreManager::calcEnd(unsigned char startBeat, unsigned char startBar, unsigned char duration) const {
+std::pair<uint8_t, uint8_t> ScoreManager::calcEnd(uint8_t startBeat, uint8_t startBar, uint8_t duration) const {
 
-	unsigned char endBeat = startBeat + duration;
-	unsigned char endBar = startBar;
+	uint8_t endBeat = startBeat + duration;
+	uint8_t endBar = startBar;
 	if (endBeat >= beat) {
 		endBeat -= beat;
 		endBar++;

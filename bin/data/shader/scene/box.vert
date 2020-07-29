@@ -12,6 +12,7 @@ uniform sampler2DRect pos;
 uniform sampler2DRect unit;
 
 uniform int num;
+uniform int barCount;
 uniform float size;
 
 out vec2 vUv;
@@ -33,7 +34,7 @@ void main(){
     float zs = u.z * 16. - (1. - s);
     vec3 ss = vec3(s, s, zs);
 
-    vec3 pos = (p * 64. - vec3(8,8,32) + vec3(0, 0, zt)) * size;
+    vec3 pos = (p * 64. - vec3(8,8,barCount*16/2) + vec3(0, 0, zt)) * size;
     pos = pos + ss * position.xyz;
 
     vUv = texcoord;

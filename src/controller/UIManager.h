@@ -2,12 +2,9 @@
 #include "ScoreManager.h"
 #include "Sequencer.h"
 #include "Grid.h"
-#include "GlobalConstants.h"
 #include "UIState.h"
 
 #include "ofxImGui.h"
-
-using namespace glm;
 
 class UIManager {
 public:
@@ -15,7 +12,7 @@ public:
 	~UIManager();
 
 	void setup(ScoreManager& score, Sequencer& sequencer);
-	void setPosition(int x, int y) { startPos = ivec2(x, y); }
+	void setPosition(int x, int y) { startPos = glm::ivec2(x, y); }
 	void draw(int offsetX, int offsetY);
 
 	void mouseMoved(ofMouseEventArgs& args);
@@ -27,12 +24,12 @@ public:
 
 private:
 
-	ivec2 translateMousePos(int x, int y);
+	glm::ivec2 translateMousePos(int x, int y);
 	void drawGrid() const;
 	void drawStateInfo() const;
 	bool isMouseFormer(int x) const;
 
-	void clear(unsigned char bar, unsigned char ch, unsigned char level);
+	void clear(uint8_t bar, uint8_t ch, uint8_t level);
 	void randomize(ExecRandom& e);
 
 
@@ -40,8 +37,8 @@ private:
 	Sequencer * sequencer;
 
 	int gridSize;
-	ivec2 startPos;
-	ivec2 size;
+	glm::ivec2 startPos;
+	glm::ivec2 size;
 
 	UIState state;
 	

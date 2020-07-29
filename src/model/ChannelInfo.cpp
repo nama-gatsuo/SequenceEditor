@@ -1,28 +1,39 @@
 #include "ChannelInfo.h"
 
-std::vector<vector<int>> ChannelInfo::scaleStep;
+const std::vector<std::vector<int>> ChannelInfo::scaleStep{
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 },
+	{ 0, 2, 4, 5, 7, 9, 11 },
+	{ 0, 2, 3, 5, 7, 8, 10 },
+	{ 0, 2, 4, 7, 9 }
+};
 
-ChannelInfo::ChannelInfo() {}
+ChannelInfo::ChannelInfo() :
+	channelIndex(-1), hue(0),
+	isRandomLoop(false), randomChordNum(1), randomNotesNum(1), velocityRange(10) {}
 
-ChannelInfo::ChannelInfo(int i, const string& name, float hue) : chIndex(i), hue(hue) {
-	chNumInDAW = chIndex + 1;
-	this->name = "ch[" + ofToString(i) + "]: " + name;
-	
+ChannelInfo::ChannelInfo(int index, const string& name, float hue) :
+	channelIndex(index), hue(hue),
+	isRandomLoop(false), randomChordNum(1), randomNotesNum(1), velocityRange(10),
+	name("ch[" + ofToString(index) + "]: " + name),
+	channelIndexInDAW(index + 1)
+{
 	colorHeader = ImColor::HSV(hue, 0.4, 0.4);
-	for (int i = 0; i < colors.size(); i++) {
-		colors[i] = ImColor::HSV(hue, 1. - 0.25 * i, 0.4 + 0.08 * i);
-	}
+	
+	int levelNum = 4;
 
-	isActive[0] = true;
-	isActive[1] = false;
-	isActive[2] = false;
-	isActive[3] = false;
+	for (int i = 0; i < levelNum; i++) {
+		LevelInfo l{
+			i == 0,
+			ImColor::HSV(hue, 1. - 0.25 * i, 0.4 + 0.08 * i)
+		};
+		levels.push_back(std::move(l));
+	}
 
 }
 
 void ChannelInfo::drawGui() {
 
-	ImGui::PushID(chIndex);
+	ImGui::PushID(channelIndex);
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colorHeader);
 	ImGui::PushStyleColor(ImGuiCol_Header, colorHeader);
 	ImGui::PopStyleColor(2);
@@ -33,10 +44,10 @@ void ChannelInfo::drawGui() {
 		
 	ImGui::PushID("active");
 	ImGui::Text("active:"); ImGui::SameLine();
-	for (int i = 0; i < 4; i++) {
-		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colors[i]);
-		ImGui::PushStyleColor(ImGuiCol_Header, colors[i]);
-		ImGui::Selectable(ofToString(i).data(), &isActive[i], 0, ImVec2(30, 30));
+	for (int i = 0; i < levels.size(); i++) {
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, levels[i].color);
+		ImGui::PushStyleColor(ImGuiCol_Header, levels[i].color);
+		ImGui::Selectable(ofToString(i).data(), &levels[i].isActive, 0, ImVec2(30, 30));
 		if (i != 3) ImGui::SameLine();
 		ImGui::PopStyleColor(2);
 	}
@@ -57,12 +68,12 @@ void ChannelInfo::drawGui() {
 	ImGui::NewLine();
 
 	ImGui::Text("Random");
-	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colors[0]);
-	ImGui::PushStyleColor(ImGuiCol_Header, colors[1]);
+	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, levels[0].color);
+	ImGui::PushStyleColor(ImGuiCol_Header, levels[1].color);
 	ImGui::Selectable("Loop", &isRandomLoop, 0, ImVec2(60, 30));
 	bool b = false;
 	if (ImGui::Selectable("Exec", &b, 0, ImVec2(60, 30))) {
-		ExecRandom e(10, chIndex);
+		ExecRandom e(10, channelIndex);
 		ofNotifyEvent(EventsEntity::execRandom, e);
 	}
 
@@ -75,7 +86,7 @@ void ChannelInfo::drawGui() {
 
 }
 
-unsigned char ChannelInfo::translateMidi(int h) const {
+uint8_t ChannelInfo::translateMidi(int h) const {
 	int oct = octave + 2;
 	int k = static_cast<int>(key);
 	int si = static_cast<int>(scale);

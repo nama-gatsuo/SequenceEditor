@@ -1,5 +1,7 @@
 #include "UIState.h"
 
+using namespace glm;
+
 void UIState::setup(GridUI& grids, ScoreManager& score) {
 	this->grids = &grids;
 	this->score = &score;
@@ -53,16 +55,17 @@ void UIState::onMouseScrolled(float y) {
 	if (code == Code::HOVER_NOTE) {
 		// copy from reference
 		// because original data will be deleted in score->update()
-		NoteModel n = score->get(noteId);
-		
-		int v = n.velocity + y * 4;
-		if (v < 0) n.velocity = 0;
-		else if (v > 128) n.velocity = 128;
-		else n.velocity = v;
+		const NoteModel& cn = score->get(grids->getBar(), grids->getChan(), noteId);
+		NoteModel nn = cn;
 
-		int id = score->update(noteId, n);
-		for (int i = 0; i < n.duration; i++) {
-			grids->get()[n.x + i][n.y][0] = id;
+		int v = nn.velocity + y * 4;
+		if (v < 0) nn.velocity = 0;
+		else if (v > 128) nn.velocity = 128;
+		else nn.velocity = v;
+
+		int id = score->update(grids->getBar(), grids->getChan(), noteId, nn);
+		for (int i = 0; i < nn.duration; i++) {
+			grids->get()[nn.x + i][nn.y][0] = id;
 		}
 		noteId = id;
 	}
@@ -76,7 +79,7 @@ void UIState::onMousePressed(bool isFormer) {
 		code = Code::DRAG_CREATE;
 		break;
 	case Code::HOVER_NOTE: {
-		NoteModel& n = score->get(noteId);
+		const auto& n = score->get(grids->getBar(), grids->getChan(), noteId);
 		if (all(equal(pressed, ivec2(n.x, n.y))) && isFormer) {
 			code = Code::DRAG_DELETE;
 		} else {
@@ -165,39 +168,40 @@ void UIState::onMouseReleased() {
 		} else {
 			// copy from reference
 			// because original data will be deleted in score->update()
-			NoteModel n = score->get(noteId);
-			if (n.x > 15 || n.y > 15) break;
-			int oldDur = n.duration;
+			const NoteModel& cn = score->get(grids->getBar(), grids->getChan(), noteId);
+			if (cn.x >= score->getBeatCount() || cn.y > score->getPitchCount()) break;
+			int oldDur = cn.duration;
 
-			int newDur = current.x - n.x + 1;
+			int newDur = current.x - cn.x + 1;
 			if (newDur < 1) newDur = 1;
 			
 			// check if there is any notes in new duration
 			if (newDur > oldDur) {
-				for (int x = n.x + oldDur + 1; x < n.x + newDur; x++) {
-					int id = grids->get()[x][n.y][0];
+				for (int x = cn.x + oldDur + 1; x < cn.x + newDur; x++) {
+					int id = grids->get()[x][cn.y][0];
 					if (id != -1) {
-						newDur = x - n.x;
+						newDur = x - cn.x;
 						break;
 					}
 				}
 			}
 
-			n.duration = newDur;
+			NoteModel nn = cn;
+			nn.duration = newDur;
 
-			noteId = score->update(noteId, n);
+			noteId = score->update(grids->getBar(), grids->getChan(), noteId, nn);
 
 			// rewrite ids on the grid
 			if (newDur > oldDur) {
-				for (int x = n.x; x < n.x + newDur; x++) {
-					grids->get()[x][n.y][0] = noteId;
+				for (int x = nn.x; x < nn.x + newDur; x++) {
+					grids->get()[x][nn.y][0] = noteId;
 				}
 			} else {
 				for (int d = 0; d < oldDur; d++) {
 					if (d < newDur) {
-						grids->get()[n.x + d][n.y][0] = noteId;
+						grids->get()[nn.x + d][nn.y][0] = noteId;
 					} else {
-						grids->get()[n.x + d][n.y][0] = -1;
+						grids->get()[nn.x + d][nn.y][0] = -1;
 					}
 					
 				}
@@ -211,11 +215,11 @@ void UIState::onMouseReleased() {
 		// delete
 		if (all(equal(current, pressed))) {
 			
-			NoteModel& n = score->get(noteId);
+			const NoteModel& n = score->get(grids->getBar(), grids->getChan(), noteId);
 			for (int x = n.x; x < n.x + n.duration; x++) {
 				grids->get()[x][n.y] = { -1, -1 };
 			}
-			score->remove(noteId);
+			score->remove(grids->getBar(), grids->getChan(), noteId);
 			
 		}
 

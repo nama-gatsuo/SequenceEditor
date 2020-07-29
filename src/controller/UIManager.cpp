@@ -1,5 +1,7 @@
 #include "UIManager.h"
 
+using namespace glm;
+
 UIManager::UIManager(int gridSize) : gridSize(gridSize) {}
 
 UIManager::~UIManager() {
@@ -17,7 +19,7 @@ void UIManager::setup(ScoreManager& score, Sequencer& sequencer) {
 	this->score = &score;
 	this->sequencer = &sequencer;
 
-	size = ivec2(gridSize * BEAT, gridSize * PITCH);
+	size = ivec2(gridSize * score.getBeatCount(), gridSize * score.getPitchCount());
 
 	ofAddListener(ofEvents().mouseMoved, this, &UIManager::mouseMoved);
 	ofAddListener(ofEvents().mousePressed, this, &UIManager::mousePressed);
@@ -28,10 +30,14 @@ void UIManager::setup(ScoreManager& score, Sequencer& sequencer) {
 
 	ofAddListener(EventsEntity::execRandom, this, &UIManager::randomize);
 
-	grids = GridUI(CHANNEL, BAR, PITCH, BEAT);
+	grids = GridUI(
+		score.getChannelCount(),
+		score.getBarCount(),
+		score.getPitchCount(),
+		score.getBeatCount()
+	);
 	grids.setBar(0);
 	grids.setChan(0, this->score->getChannelInfo(0).hue);
-	this->score->setCurrent(0, 0);
 
 	state.setup(grids, score);
 	gui.setup();
@@ -59,20 +65,20 @@ void UIManager::draw(int offsetX, int offsetY) {
 	ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4::ImVec4(0, 0, 0, 0));
 	ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4::ImVec4(0, 0, 0, 0));
 	
-	// channel select
+	// Selecting channel to edit
 	ImGui::Begin("ChannelSelect", &isDraw, window_flags);
-	int currentCh = grids.getChan();
 	ImGui::PushID("chselect");
-	for (int i = 0; i < 16; i++) {
-		auto& col1 = score->getChannelInfo(i).colors[0];
-		auto& col2 = score->getChannelInfo(i).colors[1];
+
+	for (int i = 0; i < score->getChannelCount(); i++) {
+		auto& col1 = score->getChannelInfo(i).levels[0].color;
+		auto& col2 = score->getChannelInfo(i).levels[1].color;
 		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, col1);
 		ImGui::PushStyleColor(ImGuiCol_Header, col2);
 		
-		bool b = currentCh == i;
+		bool b = grids.getChan() == i;
 		if (ImGui::Selectable(ofToString(i).data(), &b, 0, ImVec2(30, 30))) {
+			// Change channel to edit!
 			grids.setChan(i, score->getChannelInfo(i).hue);
-			score->setChan(i);
 		}
 
 		if (i % 8 != 7) ImGui::SameLine();
@@ -84,14 +90,14 @@ void UIManager::draw(int offsetX, int offsetY) {
 	
 	// channel info
 	ImGui::Begin("Channels", &isDraw, window_flags);
-	score->getChannelInfo().drawGui();
+	score->getChannelInfo(grids.getChan()).drawGui();
 	ImGui::End();
 
 	// global info
 	ImGui::Begin("Global", &isDraw, window_flags);
-	int bar = BAR;
+	int bar = score->getBarCount();
 	ImGui::SliderInt("Loop", &bar, 1, 4);
-	BAR = bar;
+	if (bar != score->getBarCount()) score->setBarCount(bar);
 
 	int bpm = sequencer->getBpm();
 	ImGui::SliderInt("BPM", &bpm, 80, 145);
@@ -101,11 +107,18 @@ void UIManager::draw(int offsetX, int offsetY) {
 
 	ImGui::PushID("edit");
 	ImGui::Text("edit  :"); ImGui::SameLine();
-	for (int i = 0; i < 4; i++) {
-		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, score->getChannelInfo().colors[i]);
-		ImGui::PushStyleColor(ImGuiCol_Header, score->getChannelInfo().colors[i]);
+
+	// Selecting level to edit
+	int levNum = score->getChannelInfo(grids.getChan()).levelNum;
+	
+	for (int i = 0; i < levNum; i++) {
+		auto& col = score->getChannelInfo(grids.getChan()).levels[i].color;
+
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, col);
+		ImGui::PushStyleColor(ImGuiCol_Header, col);
 		bool b = state.currentEditLevel == i;
 		if (ImGui::Selectable(ofToString(i).data(), &b, 0, ImVec2(30, 30))) {
+			// Change level to edit!
 			state.currentEditLevel = i;
 		}
 		
@@ -116,9 +129,11 @@ void UIManager::draw(int offsetX, int offsetY) {
 
 	ImGui::PushID("clear");
 	ImGui::Text("clear :"); ImGui::SameLine();
-	for (int i = 0; i < 4; i++) {
-		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, score->getChannelInfo().colors[i]);
-		ImGui::PushStyleColor(ImGuiCol_Header, score->getChannelInfo().colors[i]);
+	for (int i = 0; i < levNum; i++) {
+		auto& col = score->getChannelInfo(grids.getChan()).levels[i].color;
+
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, col);
+		ImGui::PushStyleColor(ImGuiCol_Header, col);
 		bool b = false;
 		if (ImGui::Selectable(ofToString(i).data(), &b, 0, ImVec2(30, 30))) {
 			clear(grids.getBar(), grids.getChan(), i);
@@ -147,7 +162,7 @@ ivec2 UIManager::translateMousePos(int x, int y) {
 		y -= beginY;
 		x /= gridSize;
 		y /= gridSize;
-		y = PITCH - y - 1;
+		y = score->getPitchCount() - y - 1;
 
 		return ivec2(x, y);
 	} else {
@@ -181,44 +196,47 @@ void UIManager::drawGrid() const {
 
 	
 	// rhythm guide
-	unsigned char cbeat = sequencer->getCurrentBeat();
-	unsigned char cbar = sequencer->getCurrentBar();
-	unsigned char bar = grids.getBar();
+	uint8_t cbeat = sequencer->getCurrentBeat();
+	uint8_t cbar = sequencer->getCurrentBar();
+	uint8_t bar = grids.getBar();
+
 	
+	uint8_t y = score->getPitchCount(); // y count
+	uint8_t x = score->getBeatCount(); // x count
+
 	if (cbar == bar) {
 		int o = 4;
 		ofNoFill();
-		ofDrawRectangle(cbeat * gridSize + o, o, gridSize - o * 2, gridSize * (PITCH + 1) - o * 2);
+		ofDrawRectangle(cbeat * gridSize + o, o, gridSize - o * 2, gridSize * (y + 1) - o * 2);
 		
 		o = 8;
 		ofFill();
-		ofDrawRectangle(cbeat * gridSize + o, PITCH * gridSize + o, gridSize - o * 2, gridSize - o * 2);
+		ofDrawRectangle(cbeat * gridSize + o, y * gridSize + o, gridSize - o * 2, gridSize - o * 2);
 	}
 
 	ofSetColor(255);
-	for (int i = 0; i < BEAT; i += 4) {
-		ofDrawBitmapString(ofToString((int)bar) + "." + ofToString(i/4), i * gridSize, PITCH * gridSize + 8);
+	for (int i = 0; i < x; i += 4) {
+		ofDrawBitmapString(ofToString((int)bar) + "." + ofToString(i/4), i * gridSize, y * gridSize + 8);
 	}
 
 	// pitch guide
-	for (int i = 0; i < CHANNEL; i++) {
-		int midiPitch = score->getChannelInfo().translateMidi(i);
+	for (int i = 0; i < y; i++) {
+		int midiPitch = score->getChannelInfo(grids.getChan()).translateMidi(i);
 		ofDrawBitmapString(ofToString(midiPitch), - 20, gridSize * i + 12);
 	}
 
 	// draw notes
-	auto& pairs = score->get();
+	const auto& pairs = score->get(bar, grids.getChan());
 	ofPushStyle();
-	for (auto& pair : pairs) {
-		unsigned char y = pair.second.y;
-		unsigned char x = pair.second.x;
-		unsigned char level = pair.second.level;
+	for (const auto& pair : pairs) {
+		uint8_t ny = pair.second.y;
+		uint8_t nx = pair.second.x;
+		uint8_t level = pair.second.level;
+		const auto& ci = score->getChannelInfo(grids.getChan());
 
-		if (y > 15 || x > 15 || level > 3) continue;
+		//if (ny >= y || nx >= x || level >= ci.levelNum) continue;
 
-		ChannelInfo ci = score->getChannelInfo();
-		bool isActive = ci.isActive[level];
-
+		bool isActive = ci.levels[level].isActive;
 		int duration = pair.second.duration;
 		int offset = (128.f - pair.second.velocity) / 128.f * gridSize * 0.5;
 
@@ -228,8 +246,9 @@ void UIManager::drawGrid() const {
 		else ofNoFill();
 
 		ofDrawRectangle(
-			offset + (int)x * gridSize, offset + (int)y * gridSize,
-			gridSize * duration - offset * 2, gridSize - offset * 2);
+			offset + (int)nx * gridSize, offset + (int)ny * gridSize,
+			gridSize * duration - offset * 2, gridSize - offset * 2
+		);
 		
 
 	}
@@ -263,7 +282,7 @@ void UIManager::drawStateInfo() const {
 			gridSize * duration - offset * 2, gridSize - offset * 2);
 	} break;
 	case UIState::Code::HOVER_NOTE: {
-		auto& n = score->get(state.noteId);
+		auto& n = score->get(grids.getBar(), grids.getChan(), state.noteId);
 		int d = n.duration;
 
 		ofSetColor(255);
@@ -286,7 +305,7 @@ void UIManager::drawStateInfo() const {
 	} break;
 	case UIState::Code::DRAG_EDIT:
 		
-		auto& n = score->get(state.noteId);
+		auto& n = score->get(grids.getBar(), grids.getChan(), state.noteId);
 		int d = state.current.x - n.x + 1;
 		if (d < 1) d = 1;
 
@@ -329,35 +348,35 @@ void UIManager::keyPressed(ofKeyEventArgs& args) {
 	switch (args.key) {
 	case OF_KEY_UP: {
 		int ch = grids.getChan() + 1;
-		if (ch >= CHANNEL) ch -= CHANNEL;
-		else if (ch < 0) ch += CHANNEL;
+		if (ch >= score->getChannelCount()) ch -= score->getChannelCount();
+		else if (ch < 0) ch += score->getChannelCount();
 
 		grids.setChan(ch, score->getChannelInfo(ch).hue);
-		score->setChan(ch);
+		
 	} break;
 	case OF_KEY_DOWN: {
 		int ch = grids.getChan() - 1;
-		if (ch >= CHANNEL) ch -= CHANNEL;
-		else if (ch < 0) ch += CHANNEL;
+		if (ch >= score->getChannelCount()) ch -= score->getChannelCount();
+		else if (ch < 0) ch += score->getChannelCount();
 
 		grids.setChan(ch, score->getChannelInfo(ch).hue);
-		score->setChan(ch);
+		
 	} break;
 	case OF_KEY_RIGHT: {
 		int bar = grids.getBar() + 1;
-		if (bar >= MAX_BAR) bar -= MAX_BAR;
-		else if (bar < 0) bar += MAX_BAR;
+		if (bar >= score->getBarCount()) bar -= score->getBarCount();
+		else if (bar < 0) bar += score->getBarCount();
 
 		grids.setBar(bar);
-		score->setBar(bar);
+		
 	} break;
 	case OF_KEY_LEFT: {
 		int bar = grids.getBar() - 1;
-		if (bar >= MAX_BAR) bar -= MAX_BAR;
-		else if (bar < 0) bar += MAX_BAR;
+		if (bar >= score->getBarCount()) bar -= score->getBarCount();
+		else if (bar < 0) bar += score->getBarCount();
 
 		grids.setBar(bar);
-		score->setBar(bar);
+		
 	} break;
 	default:
 		break;
@@ -370,22 +389,24 @@ bool UIManager::isMouseFormer(int x) const {
 	return (x / (int)(gridSize * 0.5)) % 2 == 0;
 }
 
-void UIManager::clear(unsigned char bar, unsigned char ch, unsigned char level) {
+void UIManager::clear(uint8_t bar, uint8_t ch, uint8_t level) {
 	
 	auto& g = grids.get(bar, ch);
 	
-	for (unsigned char x = 0; x < BEAT; x++) {
-		for (unsigned char y = 0; y < PITCH; y++) {
-			unsigned char id = g[x][y][0];
-			unsigned char lev = g[x][y][1];
+	for (uint8_t x = 0; x < score->getBeatCount(); x++) {
+		for (uint8_t y = 0; y < score->getPitchCount(); y++) {
+			uint8_t id = g[x][y][0];
+			uint8_t lev = g[x][y][1];
 
 			if (lev == level) {
 				g[x][y] = { -1, -1 };
-				unsigned char d = score->get(bar, ch)[id].duration;
+				uint8_t d = score->get(bar, ch)[id].duration;
 
-				if (d > 15 || y > 15 || x > 15) continue;
+				if (d >= score->getChannelCount() ||
+					y >= score->getPitchCount() ||
+					x >= score->getBeatCount()) continue;
 
-				for (unsigned char i = 0; i < d; i++) {
+				for (uint8_t i = 0; i < d; i++) {
 					g[x+i][y] = { -1, -1 };
 				}
 
@@ -410,13 +431,20 @@ void UIManager::randomize(ExecRandom& e) {
 	clear(b, e.ch, 3);
 	
 	int currentX = 0;
-	for (int i = 0; i < BEAT; i++) {
+	for (int i = 0; i < score->getBeatCount(); i++) {
 		
 		if (ofRandom(1.) < randomNotesNum) {
 			
-			int currentY = ofRandom(0, 8);
+			int currentY = 0;
+
+			if (randomChordNum == 1) {
+				currentY = ofRandom(-1, 16);
+			} else {
+				currentY = ofRandom(0, 8);
+			}
+
 			for (int j = 0; j < randomChordNum; j++) {
-				
+
 				if (grids.get(b, e.ch)[i][currentY][0] == -1) {
 
 					int vel = ofClamp(state.defaultVelocity + velRange * ofRandom(-1, 1), 0, 128);
